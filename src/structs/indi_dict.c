@@ -167,7 +167,7 @@ void indi_dict_put(indi_dict_t *o, STR_t key, buff_t val)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    node_t *node = (node_t *) indi_alloc(sizeof(node_t) + strlen(key) + 1);
+    node_t *node = indi_alloc(sizeof(node_t) + strlen(key) + 1);
 
     node->key = strcpy((str_t) (node + 1), key);
 

@@ -153,7 +153,7 @@ indi_list_t *indi_list_push(struct indi_list_s *o, buff_t val)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    node_t *node = (node_t *) indi_alloc(sizeof(node_t));
+    node_t *node = indi_alloc(sizeof(node_t));
 
     node->val = val;
     node->next = NULL;

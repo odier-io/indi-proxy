@@ -69,13 +69,13 @@ void indi_string_append(indi_string_t *o, STR_t data)
 
     if(data == NULL)
     {
-        node = (node_t *) indi_alloc(sizeof(node_t) + 0x00000000000006 + 1);
+        node = indi_alloc(sizeof(node_t) + 0x00000000000006 + 1);
 
         strcpy((str_t) (node + 1), "(null)");
     }
     else
     {
-        node = (node_t *) indi_alloc(sizeof(node_t) + strlen(data) + 1);
+        node = indi_alloc(sizeof(node_t) + strlen(data) + 1);
 
         strcpy((str_t) (node + 1), data);
     }
@@ -126,7 +126,7 @@ static str_t string_to_string(indi_string_t *o, bool json_string)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    str_t result = (str_t) indi_alloc(length + 2 + 1);
+    str_t result = indi_alloc(length + 2 + 1);
 
     str_t p = result;
 

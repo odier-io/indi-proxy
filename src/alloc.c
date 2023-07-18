@@ -108,7 +108,7 @@ str_t indi_dbldup(double d)
 {
     if(!isnan(d))
     {
-        str_t str = (str_t) indi_alloc(32 + 1);
+        str_t str = indi_alloc(32 + 1);
 
         sprintf(str, "%lf", d);
 
@@ -154,7 +154,7 @@ buff_t indi_object_new(indi_type_t type)
 
 void indi_object_free(buff_t buff)
 {
-    indi_object_t *o = (indi_object_t *) buff;
+    indi_object_t *o = buff;
 
     if(o == NULL || o->magic != 0x65656565)
     {

@@ -62,6 +62,21 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+static str_t dump(xmlDoc *doc)
+{
+    xmlChar *tmp;
+
+    xmlDocDumpMemory(doc, &tmp, NULL);
+
+    str_t result = indi_strdup((str_t) tmp + 22);
+
+    xmlFree(tmp);
+
+    return result;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 str_t indi_json_to_xml(STR_t json, bool validate)
 {
     str_t result = NULL;
@@ -72,32 +87,37 @@ str_t indi_json_to_xml(STR_t json, bool validate)
 
     if(dict == NULL)
     {
-        fprintf(stderr, "Invalid JSON document\n");
-
-        goto _err0;
+        goto _err1;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlNode *root = xmlNewNode(NULL, BAD_CAST "defSwitchVector");
-
-    json_to_xml(root, dict);
-
-    xmlDocPtr doc = xmlNewDoc(BAD_CAST "1.0");
-    xmlDocSetRootElement(doc, root);
-
-    xmlChar *xml_string;
-    xmlDocDumpFormatMemory(doc, &xml_string, NULL, 0);
-
-    printf("%s\n", xml_string);
+    xmlDoc *doc = xmlNewDoc(BAD_CAST "1.0"); xmlDocSetRootElement(doc, json_to_xml(xmlNewNode(NULL, BAD_CAST "defSwitchVector"), dict));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-//_err1:
     indi_object_free(dict);
 
-_err0:
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    if(validate && indi_validation_check(doc) == false)
+    {
+        goto _err2;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    result = dump(doc);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+_err2:
+    xmlFreeDoc(doc);
+
+_err1:
     return result;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

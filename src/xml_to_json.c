@@ -86,17 +86,13 @@ str_t indi_xml_to_json(STR_t xml, bool validate)
 
     if(doc != NULL)
     {
-        int valid = !validate || indi_validation_check(doc);
-
-        if(valid != true)
+        if(validate && indi_validation_check(doc) == false)
         {
-            fprintf(stderr, "Invalid XML content\n");
             goto _err1;
         }
     }
     else
     {
-        fprintf(stderr, "Invalid XML document\n");
         goto _err0;
     }
 
@@ -104,21 +100,16 @@ str_t indi_xml_to_json(STR_t xml, bool validate)
 
     xmlNode *root = xmlDocGetRootElement(doc);
 
-    if(root == NULL)
+    if(root != NULL)
     {
-        fprintf(stderr, "Invalid root node\n");
-        goto _err1;
+        indi_dict_t *dict = indi_dict_new();
+
+        result = indi_dict_to_string(
+            xml_to_json(dict, root)
+        );
+
+        indi_dict_free(dict);
     }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    indi_dict_t *dict = indi_dict_new();
-
-    result = indi_dict_to_string(
-        xml_to_json(dict, root)
-    );
-
-    indi_dict_free(dict);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
