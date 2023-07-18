@@ -11,19 +11,24 @@
 /* ALLOC                                                                                                              */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-#define INDI_TYPE_NULL              100
-#define INDI_TYPE_NUMBER            101
-#define INDI_TYPE_BOOLEAN           102
-#define INDI_TYPE_STRING            103
-#define INDI_TYPE_LIST              104
-#define INDI_TYPE_DICT              105
+typedef enum indi_type_e
+{
+    INDI_TYPE_NULL      = 100,
+    INDI_TYPE_BOOLEAN   = 101,
+    INDI_TYPE_NUMBER    = 102,
+    INDI_TYPE_STRING    = 103,
+    INDI_TYPE_DICT      = 104,
+    INDI_TYPE_LIST      = 105,
+
+} indi_type_t;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 typedef struct indi_object_s
 {
     uint32_t magic;
-    uint32_t type;
+
+    enum indi_type_e type;
 
 } indi_object_t;
 
@@ -50,7 +55,7 @@ str_t indi_dbldup(
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 buff_t indi_object_new(
-    int type
+    enum indi_type_e type
 );
 
 void indi_object_free(
@@ -118,7 +123,7 @@ str_t indi_number_to_string(
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static inline struct indi_number_s *indi_number_from(int data)
+static inline struct indi_number_s *indi_number_from(double data)
 {
     struct indi_number_s *result = indi_number_new();
 
@@ -162,7 +167,7 @@ str_t indi_boolean_to_string(
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static inline struct indi_boolean_s *indi_boolean_from(int data)
+static inline struct indi_boolean_s *indi_boolean_from(bool data)
 {
     struct indi_boolean_s *result = indi_boolean_new();
 
@@ -299,6 +304,85 @@ void indi_dict_put(
 
 str_t indi_dict_to_string(
     struct indi_dict_s *o
+);
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/* JSON                                                                                                               */
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef enum indi_json_token_type_e
+{
+    TOKEN_ERROR,
+    TOKEN_CURLY_OPEN,
+    TOKEN_CURLY_CLOSE,
+    TOKEN_SQUARE_OPEN,
+    TOKEN_SQUARE_CLOSE,
+    TOKEN_COLON,
+    TOKEN_COMMA,
+    TOKEN_STRING,
+    TOKEN_NUMBER,
+    TOKEN_TRUE,
+    TOKEN_FALSE,
+    TOKEN_NULL,
+    TOKEN_EOF
+
+} indi_json_token_type_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct indi_json_token_s
+{
+    str_t val;
+
+    indi_json_token_type_t token_type;
+
+} indi_json_token_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct indi_json_parser_s
+{
+    STR_t pos;
+
+    indi_json_token_t curr_token;
+
+} indi_json_parser_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+void indi_json_parser_init(
+    struct indi_json_parser_s *parser,
+    STR_t json
+);
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+indi_null_t *indi_json_parse_null(
+    struct indi_json_parser_s *parser
+);
+
+indi_boolean_t *indi_json_parse_true(
+    struct indi_json_parser_s *parser
+);
+
+indi_boolean_t *indi_json_parse_false(
+    struct indi_json_parser_s *parser
+);
+
+indi_number_t *indi_json_parse_number(
+    struct indi_json_parser_s *parser
+);
+
+indi_string_t *indi_json_parse_string(
+    struct indi_json_parser_s *parser
+);
+
+indi_dict_t *indi_json_parse_dict(
+    struct indi_json_parser_s *parser
+);
+
+indi_list_t *indi_json_parse_list(
+    struct indi_json_parser_s *parser
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
