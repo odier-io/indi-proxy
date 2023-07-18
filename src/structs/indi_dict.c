@@ -109,7 +109,7 @@ void indi_dict_del(indi_dict_t *o, STR_t key)
 
 bool indi_dict_iterate(indi_dict_iter_t *i, STR_t *key, indi_object_t **object)
 {
-    if(i->head != NULL)
+    if(i->type == INDI_TYPE_DICT && i->head != NULL)
     {
         if(key != NULL) {
             *key = i->head->key;

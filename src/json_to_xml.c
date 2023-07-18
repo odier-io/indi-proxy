@@ -1,7 +1,5 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-#include <string.h>
-
 #include <libxml/tree.h>
 
 #include "indi_proxy_internal.h"
@@ -14,15 +12,15 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
     STR_t key;
 
-    indi_object_t *object;
+    indi_object_t *object1;
 
-    for(indi_dict_iter_t iter = INDI_DICT_ITER(dict); indi_dict_iterate(&iter, &key, &object);)
+    for(indi_dict_iter_t iter1 = INDI_DICT_ITER(dict); indi_dict_iterate(&iter1, &key, &object1);)
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
         /**/ if(key[0] == '$')
         {
-            str_t val = indi_object_to_cstring(object);
+            str_t val = indi_object_to_cstring(object1);
 
             xmlNodeSetContent(node, /*--------*/ BAD_CAST val);
 
@@ -33,7 +31,7 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
         else if(key[0] == '@')
         {
-            str_t val = indi_object_to_cstring(object);
+            str_t val = indi_object_to_cstring(object1);
 
             xmlNewProp(node, BAD_CAST (key + 1), BAD_CAST val);
 
@@ -44,25 +42,14 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
         else
         {
-            xmlNodePtr the_node = NULL;
+            int idx;
 
-            for(xmlNode *new_node = xmlFirstElementChild(node); new_node; new_node = xmlNextElementSibling(new_node))
+            indi_object_t *object2;
+
+            for(indi_list_iter_t iter2 = INDI_LIST_ITER(object1); indi_list_iterate(&iter2, &idx, &object2);)
             {
-                if(strcmp((STR_t) new_node->name, key) == 0)
-                {
-                    the_node = new_node;
-
-                    break;
-                }
+                json_to_xml(xmlNewChild(node, NULL, BAD_CAST key, NULL), (indi_dict_t *) object2);
             }
-
-            if(the_node == NULL)
-            {
-                the_node = xmlNewChild(node, NULL, BAD_CAST key, NULL);
-            }
-
-
-            /* TODO */
         }
 
         /*------------------------------------------------------------------------------------------------------------*/
@@ -92,7 +79,7 @@ str_t indi_json_to_xml(STR_t json, bool validate)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlNode *root = xmlNewNode(NULL, BAD_CAST "root");
+    xmlNode *root = xmlNewNode(NULL, BAD_CAST "defSwitchVector");
 
     json_to_xml(root, dict);
 
@@ -100,7 +87,7 @@ str_t indi_json_to_xml(STR_t json, bool validate)
     xmlDocSetRootElement(doc, root);
 
     xmlChar *xml_string;
-    xmlDocDumpFormatMemory(doc, &xml_string, NULL, 1);
+    xmlDocDumpFormatMemory(doc, &xml_string, NULL, 0);
 
     printf("%s\n", xml_string);
 

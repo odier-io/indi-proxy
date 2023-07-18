@@ -11,7 +11,9 @@ int main()
         printf("Error initializing validation\n");
     }
 
-    str_t json = indi_xml_to_json("<defSwitchVector device=\"CCD Simulator\" name=\"CONNECTION\" label=\"Connection\" group=\"Main Control\" state=\"Ok\" perm=\"rw\" rule=\"OneOfMany\" timeout=\"60\" timestamp=\"2023-07-17T06:46:07\"><defSwitch name=\"CONNECT\" label=\"Connect\">On</defSwitch><defSwitch name=\"DISCONNECT\" label=\"Disconnect\">Off</defSwitch></defSwitchVector>", true);
+    STR_t xml = "<defSwitchVector device=\"CCD Simulator\" name=\"CONNECTION\" label=\"Connection\" group=\"Main Control\" state=\"Ok\" perm=\"rw\" rule=\"OneOfMany\" timeout=\"60\" timestamp=\"2023-07-17T06:46:07\"><defSwitch name=\"CONNECT\" label=\"Connect\">On</defSwitch><defSwitch name=\"DISCONNECT\" label=\"Disconnect\">Off</defSwitch></defSwitchVector>";
+
+    str_t json = indi_xml_to_json(xml, true);
 
     printf("%s\n", json);
 
@@ -19,7 +21,9 @@ int main()
 
     str_t json2 = indi_object_to_string(test);
 
-    printf("%s\n", json2);
+    printf("\n%s\n\n", json2);
+
+    printf("\n%s\n\n", xml);
 
     indi_json_to_xml(json2, false);
 

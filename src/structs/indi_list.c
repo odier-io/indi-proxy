@@ -107,7 +107,7 @@ void indi_list_del(indi_list_t *o, int idx)
 
 bool indi_list_iterate(indi_list_iter_t *i, int *idx, indi_object_t **object)
 {
-    if(i->head != NULL)
+    if(i->type == INDI_TYPE_LIST && i->head != NULL)
     {
         if(idx != NULL) {
             *idx = i->idx;

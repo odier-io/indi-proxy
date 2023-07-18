@@ -248,6 +248,8 @@ typedef struct indi_dict_iter_s
 {
     int idx;
 
+    enum indi_type_e type;
+
     struct indi_dict_node_s *head;
 
 } indi_dict_iter_t;
@@ -255,7 +257,7 @@ typedef struct indi_dict_iter_s
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define INDI_DICT_ITER(o) \
-                {0, ((struct indi_dict_iter_s *) (o))->head}
+                {0, ((struct indi_dict_s *) (o))->object.type, ((struct indi_dict_s *) (o))->head}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -310,6 +312,8 @@ typedef struct indi_list_iter_s
 {
     int idx;
 
+    enum indi_type_e type;
+
     struct indi_list_node_s *head;
 
 } indi_list_iter_t;
@@ -317,7 +321,7 @@ typedef struct indi_list_iter_s
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define INDI_LIST_ITER(o) \
-                {0, ((struct indi_list_iter_s *) (o))->head}
+                {0, ((struct indi_list_s *) (o))->object.type, ((struct indi_list_s *) (o))->head}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
