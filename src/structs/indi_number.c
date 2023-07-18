@@ -49,7 +49,7 @@ void indi_number_set(indi_number_t *o, double data)
 
 str_t indi_number_to_string(indi_number_t *o)
 {
-    return indi_dbldup(o->data);
+    return indi_double_dup(o->data);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

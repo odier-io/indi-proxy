@@ -88,13 +88,29 @@ void indi_memory_report()
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_strdup(STR_t s)
+str_t indi_boolean_dup(bool b)
 {
-    if(s != NULL)
-    {
-        str_t str = indi_alloc(strlen(s));
+    str_t str;
 
-        strcpy(str, s);
+    if(b) {
+        str = strcpy(indi_alloc(4 + 1), "true");
+    }
+    else {
+        str = strcpy(indi_alloc(5 + 1), "false");
+    }
+
+    return str;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+str_t indi_double_dup(double d)
+{
+    if(!isnan(d))
+    {
+        str_t str = indi_alloc(32 + 1);
+
+        sprintf(str, "%lf", d);
 
         return str;
     }
@@ -104,13 +120,13 @@ str_t indi_strdup(STR_t s)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_dbldup(double d)
+str_t indi_string_dup(STR_t s)
 {
-    if(!isnan(d))
+    if(s != NULL)
     {
-        str_t str = indi_alloc(32 + 1);
+        str_t str = indi_alloc(strlen(s));
 
-        sprintf(str, "%lf", d);
+        strcpy(str, s);
 
         return str;
     }

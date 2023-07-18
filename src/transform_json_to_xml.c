@@ -66,9 +66,9 @@ static str_t dump(xmlDoc *doc)
 {
     xmlChar *tmp;
 
-    xmlDocDumpMemory(doc, &tmp, NULL);
+    xmlDocDumpMemoryEnc(doc, &tmp, NULL, "utf-8");
 
-    str_t result = indi_strdup((str_t) tmp + 22);
+    str_t result = indi_string_dup((str_t) tmp + 22);
 
     xmlFree(tmp);
 

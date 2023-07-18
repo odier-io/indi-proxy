@@ -31,7 +31,7 @@ void indi_null_free(indi_null_t *o)
 
 str_t indi_null_to_string(indi_null_t *o)
 {
-    return indi_strdup("null");
+    return indi_string_dup("null");
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

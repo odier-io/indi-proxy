@@ -49,7 +49,7 @@ void indi_boolean_set(indi_boolean_t *o, bool data)
 
 str_t indi_boolean_to_string(indi_boolean_t *o)
 {
-    return indi_strdup(o->data ? "true" : "false");
+    return indi_boolean_dup(o->data);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
