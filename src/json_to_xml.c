@@ -20,7 +20,7 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
-        /**/ if(key[0] == "$")
+        /**/ if(key[0] == '$')
         {
             str_t val = indi_object_to_cstring(object);
 
