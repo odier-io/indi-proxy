@@ -17,7 +17,7 @@ int main()
 
     indi_object_t *test = indi_json_parse(json);
 
-    buff_t json2 = indi_object_to_string(test);
+    str_t json2 = indi_object_to_string(test);
 
     printf("%s\n", json2);
 

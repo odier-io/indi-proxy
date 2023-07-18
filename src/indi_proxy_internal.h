@@ -197,7 +197,7 @@ void indi_string_free(
     struct indi_string_s *o
 );
 
-struct indi_string_s *indi_string_append(
+void indi_string_append(
     struct indi_string_s *o,
     STR_t data
 );
