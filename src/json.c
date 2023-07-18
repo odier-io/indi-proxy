@@ -11,19 +11,19 @@
 
 typedef enum json_token_type_e
 {
-    TOKEN_ERROR,
-    TOKEN_CURLY_OPEN,
-    TOKEN_CURLY_CLOSE,
-    TOKEN_SQUARE_OPEN,
-    TOKEN_SQUARE_CLOSE,
-    TOKEN_COLON,
-    TOKEN_COMMA,
-    TOKEN_STRING,
-    TOKEN_NUMBER,
-    TOKEN_TRUE,
-    TOKEN_FALSE,
-    TOKEN_NULL,
-    TOKEN_EOF
+    JSON_TOKEN_EOF,
+    JSON_TOKEN_NULL,
+    JSON_TOKEN_TRUE,
+    JSON_TOKEN_FALSE,
+    JSON_TOKEN_NUMBER,
+    JSON_TOKEN_STRING,
+    JSON_TOKEN_CURLY_OPEN,
+    JSON_TOKEN_CURLY_CLOSE,
+    JSON_TOKEN_SQUARE_OPEN,
+    JSON_TOKEN_SQUARE_CLOSE,
+    JSON_TOKEN_COLON,
+    JSON_TOKEN_COMMA,
+    JSON_TOKEN_ERROR,
 
 } json_token_type_t;
 
@@ -77,48 +77,48 @@ static void tokenizer_next(json_parser_t *parser)
     switch(*parser->pos)
     {
         case '\0':
-            type = TOKEN_EOF;
+            type = JSON_TOKEN_EOF;
             break;
 
         case '{':
-            type = TOKEN_CURLY_OPEN;
+            type = JSON_TOKEN_CURLY_OPEN;
             end++;
             break;
 
         case '}':
-            type = TOKEN_CURLY_CLOSE;
+            type = JSON_TOKEN_CURLY_CLOSE;
             end++;
             break;
 
         case '[':
-            type = TOKEN_SQUARE_OPEN;
+            type = JSON_TOKEN_SQUARE_OPEN;
             end++;
             break;
 
         case ']':
-            type = TOKEN_SQUARE_CLOSE;
+            type = JSON_TOKEN_SQUARE_CLOSE;
             end++;
             break;
 
         case ':':
-            type = TOKEN_COLON;
+            type = JSON_TOKEN_COLON;
             end++;
             break;
 
         case ',':
-            type = TOKEN_COMMA;
+            type = JSON_TOKEN_COMMA;
             end++;
             break;
 
         case '"':
-            type = TOKEN_STRING;
+            type = JSON_TOKEN_STRING;
 
             end++;
             for(; *end != '\"'; end++)
             {
                 if(*end == '\0')
                 {
-                    type = TOKEN_ERROR;
+                    type = JSON_TOKEN_ERROR;
                     goto _err;
                 }
             }
@@ -128,41 +128,41 @@ static void tokenizer_next(json_parser_t *parser)
         default:
             if(*end == '-' || *end == '+' || isdigit(*end))
             {
-                type = TOKEN_NUMBER;
+                type = JSON_TOKEN_NUMBER;
 
                 for(; *end == '-' || *end == '+' || *end == '.' || *end == 'e' || *end == 'E' || isdigit(*end); end++)
                 {
                     if(*end == '\0')
                     {
-                        type = TOKEN_ERROR;
+                        type = JSON_TOKEN_ERROR;
                         goto _err;
                     }
                 }
             }
             else if(strncmp(end, "null", 4) == 0)
             {
-                type = TOKEN_NULL;
+                type = JSON_TOKEN_NULL;
                 end += 4;
             }
             else if(strncmp(end, "true", 4) == 0)
             {
-                type = TOKEN_TRUE;
+                type = JSON_TOKEN_TRUE;
                 end += 4;
             }
             else if(strncmp(end, "false", 5) == 0)
             {
-                type = TOKEN_FALSE;
+                type = JSON_TOKEN_FALSE;
                 end += 5;
             }
             else
             {
-                type = TOKEN_ERROR;
+                type = JSON_TOKEN_ERROR;
             }
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    /**/ if(type == TOKEN_NUMBER)
+    /**/ if(type == JSON_TOKEN_NUMBER)
     {
         size_t length = (size_t) end - (size_t) start - 0;
 
@@ -170,7 +170,7 @@ static void tokenizer_next(json_parser_t *parser)
 
         parser->curr_token.val[length] = '\0';
     }
-    else if(type == TOKEN_STRING)
+    else if(type == JSON_TOKEN_STRING)
     {
         size_t length = (size_t) end - (size_t) start - 2;
 
@@ -199,7 +199,7 @@ static indi_list_t *json_parse_list(json_parser_t *parser);
 
 static indi_null_t *json_parse_null(json_parser_t *parser)
 {
-    if(CHECK(TOKEN_NULL) == false)
+    if(CHECK(JSON_TOKEN_NULL) == false)
     {
         return NULL;
     }
@@ -213,7 +213,7 @@ static indi_null_t *json_parse_null(json_parser_t *parser)
 
 static indi_boolean_t *json_parse_true(json_parser_t *parser)
 {
-    if(CHECK(TOKEN_TRUE) == false)
+    if(CHECK(JSON_TOKEN_TRUE) == false)
     {
         return NULL;
     }
@@ -227,7 +227,7 @@ static indi_boolean_t *json_parse_true(json_parser_t *parser)
 
 static indi_boolean_t *json_parse_false(json_parser_t *parser)
 {
-    if(CHECK(TOKEN_FALSE) == false)
+    if(CHECK(JSON_TOKEN_FALSE) == false)
     {
         return NULL;
     }
@@ -241,7 +241,7 @@ static indi_boolean_t *json_parse_false(json_parser_t *parser)
 
 static indi_number_t *json_parse_number(json_parser_t *parser)
 {
-    if(CHECK(TOKEN_NUMBER == false))
+    if(CHECK(JSON_TOKEN_NUMBER == false))
     {
         return NULL;
     }
@@ -261,7 +261,7 @@ static indi_number_t *json_parse_number(json_parser_t *parser)
 
 static indi_string_t *json_parse_string(json_parser_t *parser)
 {
-    if(CHECK(TOKEN_STRING) == false)
+    if(CHECK(JSON_TOKEN_STRING) == false)
     {
         return NULL;
     }
@@ -285,7 +285,7 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(CHECK(TOKEN_CURLY_OPEN) == false)
+    if(CHECK(JSON_TOKEN_CURLY_OPEN) == false)
     {
         goto _err;
     }
@@ -294,11 +294,11 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    while(CHECK(TOKEN_CURLY_CLOSE) == false)
+    while(CHECK(JSON_TOKEN_CURLY_CLOSE) == false)
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
-        if(CHECK(TOKEN_COLON) == false)
+        if(CHECK(JSON_TOKEN_COLON) == false)
         {
             ////_free(key);
 
@@ -309,7 +309,7 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
         NEXT();
 
-        if(CHECK(TOKEN_COLON) == false)
+        if(CHECK(JSON_TOKEN_COLON) == false)
         {
             indi_free(key);
 
@@ -320,25 +320,25 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
         /*------------------------------------------------------------------------------------------------------------*/
 
-        /**/ if(CHECK(TOKEN_NULL)) {
+        /**/ if(CHECK(JSON_TOKEN_NULL)) {
             indi_dict_put(result, key, json_parse_null(parser));
         }
-        else if(CHECK(TOKEN_TRUE)) {
+        else if(CHECK(JSON_TOKEN_TRUE)) {
             indi_dict_put(result, key, json_parse_true(parser));
         }
-        else if(CHECK(TOKEN_FALSE)) {
+        else if(CHECK(JSON_TOKEN_FALSE)) {
             indi_dict_put(result, key, json_parse_false(parser));
         }
-        else if(CHECK(TOKEN_NUMBER)) {
+        else if(CHECK(JSON_TOKEN_NUMBER)) {
             indi_dict_put(result, key, json_parse_number(parser));
         }
-        else if(CHECK(TOKEN_STRING)) {
+        else if(CHECK(JSON_TOKEN_STRING)) {
             indi_dict_put(result, key, json_parse_string(parser));
         }
-        else if(CHECK(TOKEN_CURLY_OPEN)) {
+        else if(CHECK(JSON_TOKEN_CURLY_OPEN)) {
             indi_dict_put(result, key, json_parse_dict(parser));
         }
-        else if(CHECK(TOKEN_SQUARE_OPEN)) {
+        else if(CHECK(JSON_TOKEN_SQUARE_OPEN)) {
             indi_dict_put(result, key, json_parse_list(parser));
         }
         else
@@ -354,18 +354,18 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
         /*------------------------------------------------------------------------------------------------------------*/
 
-        if(CHECK(TOKEN_COMMA) == true)
+        if(CHECK(JSON_TOKEN_COMMA) == true)
         {
             NEXT();
 
-            if(CHECK(TOKEN_CURLY_CLOSE) == true)
+            if(CHECK(JSON_TOKEN_CURLY_CLOSE) == true)
             {
                 goto _err;
             }
         }
         else
         {
-            if(CHECK(TOKEN_CURLY_CLOSE) == false)
+            if(CHECK(JSON_TOKEN_CURLY_CLOSE) == false)
             {
                 goto _err;
             }
@@ -377,7 +377,7 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(CHECK(TOKEN_CURLY_CLOSE) == false)
+    if(CHECK(JSON_TOKEN_CURLY_CLOSE) == false)
     {
         goto _err;
     }
@@ -402,7 +402,7 @@ static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-rec
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(CHECK(TOKEN_SQUARE_OPEN) == false)
+    if(CHECK(JSON_TOKEN_SQUARE_OPEN) == false)
     {
         goto _err;
     }
@@ -411,29 +411,29 @@ static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-rec
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    while(CHECK(TOKEN_SQUARE_CLOSE) == false)
+    while(CHECK(JSON_TOKEN_SQUARE_CLOSE) == false)
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
-        /**/ if(CHECK(TOKEN_NULL)) {
+        /**/ if(CHECK(JSON_TOKEN_NULL)) {
             indi_list_push(result, json_parse_null(parser));
         }
-        else if(CHECK(TOKEN_TRUE)) {
+        else if(CHECK(JSON_TOKEN_TRUE)) {
             indi_list_push(result, json_parse_true(parser));
         }
-        else if(CHECK(TOKEN_FALSE)) {
+        else if(CHECK(JSON_TOKEN_FALSE)) {
             indi_list_push(result, json_parse_false(parser));
         }
-        else if(CHECK(TOKEN_NUMBER)) {
+        else if(CHECK(JSON_TOKEN_NUMBER)) {
             indi_list_push(result, json_parse_number(parser));
         }
-        else if(CHECK(TOKEN_STRING)) {
+        else if(CHECK(JSON_TOKEN_STRING)) {
             indi_list_push(result, json_parse_string(parser));
         }
-        else if(CHECK(TOKEN_CURLY_OPEN)) {
+        else if(CHECK(JSON_TOKEN_CURLY_OPEN)) {
             indi_list_push(result, json_parse_dict(parser));
         }
-        else if(CHECK(TOKEN_SQUARE_OPEN)) {
+        else if(CHECK(JSON_TOKEN_SQUARE_OPEN)) {
             indi_list_push(result, json_parse_list(parser));
         }
         else
@@ -443,18 +443,18 @@ static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-rec
 
         /*------------------------------------------------------------------------------------------------------------*/
 
-        if(CHECK(TOKEN_COMMA) == true)
+        if(CHECK(JSON_TOKEN_COMMA) == true)
         {
             NEXT();
 
-            if(CHECK(TOKEN_SQUARE_CLOSE) == true)
+            if(CHECK(JSON_TOKEN_SQUARE_CLOSE) == true)
             {
                 goto _err;
             }
         }
         else
         {
-            if(CHECK(TOKEN_SQUARE_CLOSE) == false)
+            if(CHECK(JSON_TOKEN_SQUARE_CLOSE) == false)
             {
                 goto _err;
             }
@@ -465,7 +465,7 @@ static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-rec
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(CHECK(TOKEN_SQUARE_CLOSE) == false)
+    if(CHECK(JSON_TOKEN_SQUARE_CLOSE) == false)
     {
         goto _err;
     }
@@ -498,7 +498,7 @@ indi_object_t *indi_json_parse(STR_t json)
 
     parser->curr_token.val = NULL;
 
-    parser->curr_token.token_type = TOKEN_ERROR;
+    parser->curr_token.token_type = JSON_TOKEN_ERROR;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -506,25 +506,25 @@ indi_object_t *indi_json_parse(STR_t json)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    /**/ if(CHECK(TOKEN_NULL)) {
+    /**/ if(CHECK(JSON_TOKEN_NULL)) {
         return (indi_object_t *) json_parse_null(parser);
     }
-    else if(CHECK(TOKEN_TRUE)) {
+    else if(CHECK(JSON_TOKEN_TRUE)) {
         return (indi_object_t *) json_parse_true(parser);
     }
-    else if(CHECK(TOKEN_FALSE)) {
+    else if(CHECK(JSON_TOKEN_FALSE)) {
         return (indi_object_t *) json_parse_false(parser);
     }
-    else if(CHECK(TOKEN_NUMBER)) {
+    else if(CHECK(JSON_TOKEN_NUMBER)) {
         return (indi_object_t *) json_parse_number(parser);
     }
-    else if(CHECK(TOKEN_STRING)) {
+    else if(CHECK(JSON_TOKEN_STRING)) {
         return (indi_object_t *) json_parse_string(parser);
     }
-    else if(CHECK(TOKEN_CURLY_OPEN)) {
+    else if(CHECK(JSON_TOKEN_CURLY_OPEN)) {
         return (indi_object_t *) json_parse_dict(parser);
     }
-    else if(CHECK(TOKEN_SQUARE_OPEN)) {
+    else if(CHECK(JSON_TOKEN_SQUARE_OPEN)) {
         return (indi_object_t *) json_parse_list(parser);
     }
 
