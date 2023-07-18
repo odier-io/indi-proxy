@@ -6,7 +6,7 @@
 
 #include "indi_proxy_internal.h"
 
-#include "indi_proxy_xsd.h"
+#include "indi_proxy_schema.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 

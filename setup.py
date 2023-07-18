@@ -21,7 +21,7 @@ def main():
 
     ####################################################################################################################
 
-    with open('src/indi_proxy_xsd.h', 'wt') as f:
+    with open('src/indi_proxy_schema.h', 'wt') as f:
 
         f.write(f'/* file: indi.xsd */\n\n')
 
