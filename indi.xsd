@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- *************************************************************************************************************** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:simpleType name="propertyPerm">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="ro"/>
+      <xs:enumeration value="wo"/>
+      <xs:enumeration value="rw"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="propertyState">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Idle"/>
+      <xs:enumeration value="Ok"/>
+      <xs:enumeration value="Busy"/>
+      <xs:enumeration value="Alert"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="switchRule">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="OneOfMany"/>
+      <xs:enumeration value="AtMostOne"/>
+      <xs:enumeration value="AnyOfMany"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- *************************************************************************************************************** -->
+  <!-- Properties -->
+  <!-- *************************************************************************************************************** -->
+  <xs:element name="getProperties">
+    <xs:complexType>
+      <xs:attribute name="version" use="required"/>
+      <xs:attribute name="device"/>
+      <xs:attribute name="name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="enableBLOB">
+    <xs:complexType mixed="true">
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- *************************************************************************************************************** -->
+  <!-- Number definitions -->
+  <!-- *************************************************************************************************************** -->
+  <xs:element name="defNumberVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="defNumber"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+      <xs:attribute name="group"/>
+      <xs:attribute name="state" use="required" type="propertyState"/>
+      <xs:attribute name="perm" use="required" type="propertyPerm"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="defNumber">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+      <xs:attribute name="format" use="required"/>
+      <xs:attribute name="min" use="required"/>
+      <xs:attribute name="max" use="required"/>
+      <xs:attribute name="step" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="setNumberVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneNumber"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="state" type="propertyState"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="newNumberVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneNumber"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="timestamp"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oneNumber">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- *************************************************************************************************************** -->
+  <!-- Text definitions -->
+  <!-- *************************************************************************************************************** -->
+  <xs:element name="defTextVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="defText"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+      <xs:attribute name="group"/>
+      <xs:attribute name="state" use="required" type="propertyState"/>
+      <xs:attribute name="perm" use="required" type="propertyPerm"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="defText">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="setTextVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneText"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="state" type="propertyState"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="newTextVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneText"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="timestamp"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oneText">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- *************************************************************************************************************** -->
+  <!-- Light Definitions -->
+  <!-- *************************************************************************************************************** -->
+  <xs:element name="defLightVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="defLight"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+      <xs:attribute name="group"/>
+      <xs:attribute name="state" use="required" type="propertyState"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="defLight">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="setLightVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneLight"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="state" type="propertyState"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oneLight">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- *************************************************************************************************************** -->
+  <!-- Switch Definitions -->
+  <!-- *************************************************************************************************************** -->
+  <xs:element name="defSwitchVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="defSwitch"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+      <xs:attribute name="group"/>
+      <xs:attribute name="state" use="required" type="propertyState"/>
+      <xs:attribute name="perm" use="required" type="propertyPerm"/>
+      <xs:attribute name="rule" use="required" type="switchRule"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="defSwitch">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="setSwitchVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneSwitch"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="state" type="propertyState"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="newSwitchVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneSwitch"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="timestamp"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oneSwitch">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- *************************************************************************************************************** -->
+  <!-- BLOB Definitions -->
+  <!-- *************************************************************************************************************** -->
+  <xs:element name="defBLOBVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="defBLOB"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+      <xs:attribute name="group"/>
+      <xs:attribute name="state" use="required" type="propertyState"/>
+      <xs:attribute name="perm" use="required" type="propertyPerm"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="defBLOB">
+    <xs:complexType>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="label"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="setBLOBVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneBLOB"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="state" type="propertyState"/>
+      <xs:attribute name="timeout"/>
+      <xs:attribute name="timestamp"/>
+      <xs:attribute name="message"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="newBLOBVector">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oneBLOB"/>
+      </xs:sequence>
+      <xs:attribute name="device" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="timestamp"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oneBLOB">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="size" use="required"/>
+      <xs:attribute name="format" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+<!-- *************************************************************************************************************** -->
