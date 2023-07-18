@@ -6,7 +6,7 @@ def main():
 
     ####################################################################################################################
 
-    with open('schema/indi.xsd', 'rb') as f:
+    with open('src/schema/indi.xsd', 'rb') as f:
 
         data_in = bytearray(f.read())
 
@@ -21,7 +21,7 @@ def main():
 
     ####################################################################################################################
 
-    with open('indi_proxy_xsd.h', 'wt') as f:
+    with open('src/indi_proxy_xsd.h', 'wt') as f:
 
         f.write(f'/* file: indi.xsd */\n\n')
 
