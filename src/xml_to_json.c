@@ -36,9 +36,9 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, void *curr_node_ptr) // NOLIN
         /**/    str_t attribute_name = indi_string_to_cstring(o);
         /**/
         /**/    /**/    xmlChar *attribute_val = xmlNodeListGetString(curr_node->doc, attribute->children, 1);
-        /**/
+        /**/    /**/
         /**/    /**/    /**/    indi_dict_put(dict, (str_t) attribute_name, indi_string_from((str_t) attribute_val));
-        /**/
+        /**/    /**/
         /**/    /**/    xmlFree(attribute_val);
         /**/
         /**/    indi_free(attribute_name);
