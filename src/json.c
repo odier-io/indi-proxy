@@ -9,31 +9,72 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-#define NEXT() \
-            tokenizer_next(perser)
+typedef enum json_token_type_e
+{
+    TOKEN_ERROR,
+    TOKEN_CURLY_OPEN,
+    TOKEN_CURLY_CLOSE,
+    TOKEN_SQUARE_OPEN,
+    TOKEN_SQUARE_CLOSE,
+    TOKEN_COLON,
+    TOKEN_COMMA,
+    TOKEN_STRING,
+    TOKEN_NUMBER,
+    TOKEN_TRUE,
+    TOKEN_FALSE,
+    TOKEN_NULL,
+    TOKEN_EOF
 
-#define PEEK() \
-            (perser->curr_token)
-
-#define CHECK(t) \
-            (perser->curr_token.token_type == (t))
+} json_token_type_t;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static void tokenizer_next(indi_json_parser_t *perser)
+typedef struct json_token_s
+{
+    str_t val;
+
+    json_token_type_t token_type;
+
+} json_token_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct json_parser_s
+{
+    STR_t pos;
+
+    json_token_t curr_token;
+
+} json_parser_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+#define NEXT() \
+            tokenizer_next(parser)
+
+#define PEEK() \
+            (parser->curr_token)
+
+#define CHECK(t) \
+            (parser->curr_token.token_type == (t))
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static void tokenizer_next(json_parser_t *parser)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(; isspace(*perser->pos); perser->pos++);
+    for(; isspace(*parser->pos); parser->pos++);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    const char *start = perser->pos;
-    const char *end = perser->pos;
+    const char *start = parser->pos;
+    const char *end = parser->pos;
 
-    indi_json_token_type_t type;
+    json_token_type_t type;
 
-    switch(*perser->pos)
+    switch(*parser->pos)
     {
         case '\0':
             type = TOKEN_EOF;
@@ -125,51 +166,38 @@ static void tokenizer_next(indi_json_parser_t *perser)
     {
         size_t length = (size_t) end - (size_t) start - 0;
 
-        perser->curr_token.val = strncpy(indi_alloc(length + 1), start + 0, length);
+        parser->curr_token.val = strncpy(indi_alloc(length + 1), start + 0, length);
 
-        perser->curr_token.val[length] = '\0';
+        parser->curr_token.val[length] = '\0';
     }
     else if(type == TOKEN_STRING)
     {
         size_t length = (size_t) end - (size_t) start - 2;
 
-        perser->curr_token.val = strncpy(indi_alloc(length + 1), start + 1, length);
+        parser->curr_token.val = strncpy(indi_alloc(length + 1), start + 1, length);
 
-        perser->curr_token.val[length] = '\0';
+        parser->curr_token.val[length] = '\0';
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
 _err:
-    perser->curr_token.token_type = type;
+    parser->curr_token.token_type = type;
 
-    perser->pos = end;
+    parser->pos = end;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_json_parser_init(struct indi_json_parser_s *parser, STR_t json)
-{
-    /*----------------------------------------------------------------------------------------------------------------*/
+static indi_dict_t *json_parse_dict(json_parser_t *parser);
 
-    parser->pos = json;
-
-    parser->curr_token.val = NULL;
-
-    parser->curr_token.token_type = TOKEN_ERROR;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    tokenizer_next(parser);
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-}
+static indi_list_t *json_parse_list(json_parser_t *parser);
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_null_t *indi_json_parse_null(indi_json_parser_t *perser)
+static indi_null_t *json_parse_null(json_parser_t *parser)
 {
     if(CHECK(TOKEN_NULL) == false)
     {
@@ -183,7 +211,7 @@ indi_null_t *indi_json_parse_null(indi_json_parser_t *perser)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_boolean_t *indi_json_parse_true(indi_json_parser_t *perser)
+static indi_boolean_t *json_parse_true(json_parser_t *parser)
 {
     if(CHECK(TOKEN_TRUE) == false)
     {
@@ -197,7 +225,7 @@ indi_boolean_t *indi_json_parse_true(indi_json_parser_t *perser)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_boolean_t *indi_json_parse_false(indi_json_parser_t *perser)
+static indi_boolean_t *json_parse_false(json_parser_t *parser)
 {
     if(CHECK(TOKEN_FALSE) == false)
     {
@@ -211,7 +239,7 @@ indi_boolean_t *indi_json_parse_false(indi_json_parser_t *perser)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_number_t *indi_json_parse_number(indi_json_parser_t *perser)
+static indi_number_t *json_parse_number(json_parser_t *parser)
 {
     if(CHECK(TOKEN_NUMBER == false))
     {
@@ -231,7 +259,7 @@ indi_number_t *indi_json_parse_number(indi_json_parser_t *perser)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_string_t *indi_json_parse_string(indi_json_parser_t *perser)
+static indi_string_t *json_parse_string(json_parser_t *parser)
 {
     if(CHECK(TOKEN_STRING) == false)
     {
@@ -251,7 +279,7 @@ indi_string_t *indi_json_parse_string(indi_json_parser_t *perser)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_dict_t *indi_json_parse_dict(indi_json_parser_t *perser)
+static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-recursion)
 {
     indi_dict_t *result = indi_dict_new();
 
@@ -293,25 +321,25 @@ indi_dict_t *indi_json_parse_dict(indi_json_parser_t *perser)
         /*------------------------------------------------------------------------------------------------------------*/
 
         /**/ if(CHECK(TOKEN_NULL)) {
-            indi_dict_put(result, key, indi_json_parse_null(perser));
+            indi_dict_put(result, key, json_parse_null(parser));
         }
         else if(CHECK(TOKEN_TRUE)) {
-            indi_dict_put(result, key, indi_json_parse_true(perser));
+            indi_dict_put(result, key, json_parse_true(parser));
         }
         else if(CHECK(TOKEN_FALSE)) {
-            indi_dict_put(result, key, indi_json_parse_false(perser));
+            indi_dict_put(result, key, json_parse_false(parser));
         }
         else if(CHECK(TOKEN_NUMBER)) {
-            indi_dict_put(result, key, indi_json_parse_number(perser));
+            indi_dict_put(result, key, json_parse_number(parser));
         }
         else if(CHECK(TOKEN_STRING)) {
-            indi_dict_put(result, key, indi_json_parse_string(perser));
+            indi_dict_put(result, key, json_parse_string(parser));
         }
         else if(CHECK(TOKEN_CURLY_OPEN)) {
-            indi_dict_put(result, key, indi_json_parse_dict(perser));
+            indi_dict_put(result, key, json_parse_dict(parser));
         }
         else if(CHECK(TOKEN_SQUARE_OPEN)) {
-            indi_dict_put(result, key, indi_json_parse_list(perser));
+            indi_dict_put(result, key, json_parse_list(parser));
         }
         else
         {
@@ -368,7 +396,7 @@ _err:
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_list_t *indi_json_parse_list(indi_json_parser_t *perser)
+static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-recursion)
 {
     indi_list_t *result = indi_list_new();
 
@@ -388,25 +416,25 @@ indi_list_t *indi_json_parse_list(indi_json_parser_t *perser)
         /*------------------------------------------------------------------------------------------------------------*/
 
         /**/ if(CHECK(TOKEN_NULL)) {
-            indi_list_push(result, indi_json_parse_null(perser));
+            indi_list_push(result, json_parse_null(parser));
         }
         else if(CHECK(TOKEN_TRUE)) {
-            indi_list_push(result, indi_json_parse_true(perser));
+            indi_list_push(result, json_parse_true(parser));
         }
         else if(CHECK(TOKEN_FALSE)) {
-            indi_list_push(result, indi_json_parse_false(perser));
+            indi_list_push(result, json_parse_false(parser));
         }
         else if(CHECK(TOKEN_NUMBER)) {
-            indi_list_push(result, indi_json_parse_number(perser));
+            indi_list_push(result, json_parse_number(parser));
         }
         else if(CHECK(TOKEN_STRING)) {
-            indi_list_push(result, indi_json_parse_string(perser));
+            indi_list_push(result, json_parse_string(parser));
         }
         else if(CHECK(TOKEN_CURLY_OPEN)) {
-            indi_list_push(result, indi_json_parse_dict(perser));
+            indi_list_push(result, json_parse_dict(parser));
         }
         else if(CHECK(TOKEN_SQUARE_OPEN)) {
-            indi_list_push(result, indi_json_parse_list(perser));
+            indi_list_push(result, json_parse_list(parser));
         }
         else
         {
@@ -450,6 +478,57 @@ indi_list_t *indi_json_parse_list(indi_json_parser_t *perser)
 
 _err:
     indi_list_free(result);
+
+    return NULL;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+indi_object_t *indi_json_parse(STR_t json)
+{
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    json_parser_t _parser = {};
+
+    json_parser_t *parser = &_parser;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    parser->pos = json;
+
+    parser->curr_token.val = NULL;
+
+    parser->curr_token.token_type = TOKEN_ERROR;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    tokenizer_next(parser);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    /**/ if(CHECK(TOKEN_NULL)) {
+        return (indi_object_t *) json_parse_null(parser);
+    }
+    else if(CHECK(TOKEN_TRUE)) {
+        return (indi_object_t *) json_parse_true(parser);
+    }
+    else if(CHECK(TOKEN_FALSE)) {
+        return (indi_object_t *) json_parse_false(parser);
+    }
+    else if(CHECK(TOKEN_NUMBER)) {
+        return (indi_object_t *) json_parse_number(parser);
+    }
+    else if(CHECK(TOKEN_STRING)) {
+        return (indi_object_t *) json_parse_string(parser);
+    }
+    else if(CHECK(TOKEN_CURLY_OPEN)) {
+        return (indi_object_t *) json_parse_dict(parser);
+    }
+    else if(CHECK(TOKEN_SQUARE_OPEN)) {
+        return (indi_object_t *) json_parse_list(parser);
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
 
     return NULL;
 }

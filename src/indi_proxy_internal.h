@@ -226,46 +226,6 @@ static inline struct indi_string_s *indi_string_from(STR_t data)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* LIST                                                                                                               */
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-typedef struct indi_list_s
-{
-    struct indi_object_s object;
-
-    struct indi_list_node_s *head;
-    struct indi_list_node_s *tail;
-
-} indi_list_t;
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-struct indi_list_s *indi_list_new();
-
-void indi_list_free(
-    struct indi_list_s *o
-);
-
-void indi_list_del(
-    struct indi_list_s *o,
-    int idx
-);
-
-struct indi_object_s *indi_list_get(
-    struct indi_list_s *o,
-    int idx
-);
-
-struct indi_list_s *indi_list_push(
-    struct indi_list_s *o,
-    buff_t val
-);
-
-str_t indi_list_to_string(
-    struct indi_list_s *o
-);
-
-/*--------------------------------------------------------------------------------------------------------------------*/
 /* DICT                                                                                                               */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -307,82 +267,51 @@ str_t indi_dict_to_string(
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
+/* LIST                                                                                                               */
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct indi_list_s
+{
+    struct indi_object_s object;
+
+    struct indi_list_node_s *head;
+    struct indi_list_node_s *tail;
+
+} indi_list_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+struct indi_list_s *indi_list_new();
+
+void indi_list_free(
+    struct indi_list_s *o
+);
+
+void indi_list_del(
+    struct indi_list_s *o,
+    int idx
+);
+
+struct indi_object_s *indi_list_get(
+    struct indi_list_s *o,
+    int idx
+);
+
+struct indi_list_s *indi_list_push(
+    struct indi_list_s *o,
+    buff_t val
+);
+
+str_t indi_list_to_string(
+    struct indi_list_s *o
+);
+
+/*--------------------------------------------------------------------------------------------------------------------*/
 /* JSON                                                                                                               */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-typedef enum indi_json_token_type_e
-{
-    TOKEN_ERROR,
-    TOKEN_CURLY_OPEN,
-    TOKEN_CURLY_CLOSE,
-    TOKEN_SQUARE_OPEN,
-    TOKEN_SQUARE_CLOSE,
-    TOKEN_COLON,
-    TOKEN_COMMA,
-    TOKEN_STRING,
-    TOKEN_NUMBER,
-    TOKEN_TRUE,
-    TOKEN_FALSE,
-    TOKEN_NULL,
-    TOKEN_EOF
-
-} indi_json_token_type_t;
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-typedef struct indi_json_token_s
-{
-    str_t val;
-
-    indi_json_token_type_t token_type;
-
-} indi_json_token_t;
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-typedef struct indi_json_parser_s
-{
-    STR_t pos;
-
-    indi_json_token_t curr_token;
-
-} indi_json_parser_t;
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-void indi_json_parser_init(
-    struct indi_json_parser_s *parser,
+struct indi_object_s *indi_json_parse(
     STR_t json
-);
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-indi_null_t *indi_json_parse_null(
-    struct indi_json_parser_s *parser
-);
-
-indi_boolean_t *indi_json_parse_true(
-    struct indi_json_parser_s *parser
-);
-
-indi_boolean_t *indi_json_parse_false(
-    struct indi_json_parser_s *parser
-);
-
-indi_number_t *indi_json_parse_number(
-    struct indi_json_parser_s *parser
-);
-
-indi_string_t *indi_json_parse_string(
-    struct indi_json_parser_s *parser
-);
-
-indi_dict_t *indi_json_parse_dict(
-    struct indi_json_parser_s *parser
-);
-
-indi_list_t *indi_json_parse_list(
-    struct indi_json_parser_s *parser
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
