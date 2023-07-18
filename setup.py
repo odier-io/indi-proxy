@@ -6,7 +6,7 @@ def main():
 
     ####################################################################################################################
 
-    with open('indi.xsd', 'rb') as f:
+    with open('schema/indi.xsd', 'rb') as f:
 
         data_in = bytearray(f.read())
 
