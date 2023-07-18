@@ -10,13 +10,13 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static xmlSchemaPtr INDI_SCHEMA = NULL;
+static xmlSchema *INDI_SCHEMA = NULL;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 int indi_validation_init()
 {
-    xmlSchemaParserCtxtPtr context = xmlSchemaNewMemParserCtxt(indi_proxy_xsd_buff, INDI_PROXY_XSD_SIZE);
+    xmlSchemaParserCtxt *context = xmlSchemaNewMemParserCtxt(indi_proxy_xsd_buff, INDI_PROXY_XSD_SIZE);
 
     if(context == NULL)
     {
@@ -61,9 +61,9 @@ int indi_validation_free()
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_validation_check(void *doc)
+bool indi_validation_check(struct _xmlDoc *doc)
 {
-    xmlSchemaValidCtxtPtr context = xmlSchemaNewValidCtxt(INDI_SCHEMA);
+    xmlSchemaValidCtxt *context = xmlSchemaNewValidCtxt(INDI_SCHEMA);
 
     if(context == NULL)
     {
@@ -81,7 +81,7 @@ bool indi_validation_check(void *doc)
     /**/
     /**/    /*--------------------------------------------------------------------------------------------------------*/
     /**/
-    /**/    int result = xmlSchemaValidateDoc(context, (xmlDocPtr) doc) == 0;
+    /**/    int result = xmlSchemaValidateDoc(context, (xmlDoc *) doc) == 0;
     /**/
     /**/    /*--------------------------------------------------------------------------------------------------------*/
 
