@@ -8,10 +8,8 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static indi_dict_t *xml_to_json(indi_dict_t *dict, void *curr_node_ptr) // NOLINT(misc-no-recursion)
+static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT(misc-no-recursion)
 {
-    xmlNode *curr_node = (xmlNode *) curr_node_ptr;
-
     /*----------------------------------------------------------------------------------------------------------------*/
 
     for(xmlNode *new_node = curr_node->children; new_node != NULL; new_node = new_node->next)
@@ -84,7 +82,7 @@ str_t indi_xml_to_json(STR_t xml, bool validate)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlDocPtr doc = xmlReadMemory(xml, (int) strlen(xml), "message.xml", "utf-8", 0);
+    xmlDoc *doc = xmlReadMemory(xml, (int) strlen(xml), "message.xml", "utf-8", 0);
 
     if(doc != NULL)
     {
@@ -98,13 +96,13 @@ str_t indi_xml_to_json(STR_t xml, bool validate)
     }
     else
     {
-        fprintf(stderr, "Invalid XML file\n");
+        fprintf(stderr, "Invalid XML document\n");
         goto _err0;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlNodePtr root = xmlDocGetRootElement(doc);
+    xmlNode *root = xmlDocGetRootElement(doc);
 
     if(root == NULL)
     {

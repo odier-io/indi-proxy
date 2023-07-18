@@ -21,6 +21,8 @@ int main()
 
     printf("%s\n", json2);
 
+    indi_json_to_xml(json2, false);
+
     indi_free(json2);
 
     indi_object_free(test);

@@ -105,6 +105,29 @@ void indi_list_del(indi_list_t *o, int idx)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+bool indi_list_iterate(indi_list_iter_t *i, int *idx, indi_object_t **object)
+{
+    if(i->head != NULL)
+    {
+        if(idx != NULL) {
+            *idx = i->idx;
+        }
+
+        if(object != NULL) {
+            *object = i->head->val;
+        }
+
+        i->idx += 0x0000000001;
+        i->head = i->head->next;
+
+        return true;
+    }
+
+    return false;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 indi_object_t *indi_list_get(indi_list_t *o, int idx)
 {
     /*----------------------------------------------------------------------------------------------------------------*/

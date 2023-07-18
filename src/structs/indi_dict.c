@@ -107,6 +107,29 @@ void indi_dict_del(indi_dict_t *o, STR_t key)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+bool indi_dict_iterate(indi_dict_iter_t *i, STR_t *key, indi_object_t **object)
+{
+    if(i->head != NULL)
+    {
+        if(key != NULL) {
+            *key = i->head->key;
+        }
+
+        if(object != NULL) {
+            *object = i->head->val;
+        }
+
+        i->idx += 0x0000000001;
+        i->head = i->head->next;
+
+        return true;
+    }
+
+    return false;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 indi_object_t *indi_dict_get(indi_dict_t *o, STR_t key)
 {
     /*----------------------------------------------------------------------------------------------------------------*/

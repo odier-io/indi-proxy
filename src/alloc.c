@@ -237,3 +237,43 @@ str_t indi_object_to_string(buff_t buff)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
+
+str_t indi_object_to_cstring(buff_t buff)
+{
+    indi_object_t *o = (indi_object_t *) buff;
+
+    if(o == NULL || o->magic != 0x65656565)
+    {
+        fprintf(stderr, "Invalid object!\n");
+        fflush(stderr);
+        exit(1);
+    }
+
+    switch(o->type)
+    {
+        case INDI_TYPE_NULL:
+            return indi_null_to_string((indi_null_t *) o);
+
+        case INDI_TYPE_NUMBER:
+            return indi_number_to_string((indi_number_t *) o);
+
+        case INDI_TYPE_BOOLEAN:
+            return indi_boolean_to_string((indi_boolean_t *) o);
+
+        case INDI_TYPE_STRING:
+            return indi_string_to_cstring((indi_string_t *) o);
+
+        case INDI_TYPE_LIST:
+            return indi_list_to_string((indi_list_t *) o);
+
+        case INDI_TYPE_DICT:
+            return indi_dict_to_string((indi_dict_t *) o);
+
+        default:
+            fprintf(stderr, "Internal error!\n");
+            fflush(stderr);
+            exit(1);
+    }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/

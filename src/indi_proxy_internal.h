@@ -66,6 +66,10 @@ str_t indi_object_to_string(
     buff_t object
 );
 
+str_t indi_object_to_cstring(
+    buff_t object
+);
+
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* NULL                                                                                                               */
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -240,6 +244,21 @@ typedef struct indi_dict_s
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+typedef struct indi_dict_iter_s
+{
+    int idx;
+
+    struct indi_dict_node_s *head;
+
+} indi_dict_iter_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+#define INDI_DICT_ITER(o) \
+                {0, ((struct indi_dict_iter_s *) (o))->head}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 indi_dict_t *indi_dict_new();
 
 void indi_dict_free(
@@ -249,6 +268,12 @@ void indi_dict_free(
 void indi_dict_del(
     struct indi_dict_s *o,
     STR_t key
+);
+
+bool indi_dict_iterate(
+    struct indi_dict_iter_s *i,
+    STR_t *key,
+    indi_object_t **object
 );
 
 struct indi_object_s *indi_dict_get(
@@ -281,6 +306,21 @@ typedef struct indi_list_s
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+typedef struct indi_list_iter_s
+{
+    int idx;
+
+    struct indi_list_node_s *head;
+
+} indi_list_iter_t;
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+#define INDI_LIST_ITER(o) \
+                {0, ((struct indi_list_iter_s *) (o))->head}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 struct indi_list_s *indi_list_new();
 
 void indi_list_free(
@@ -290,6 +330,12 @@ void indi_list_free(
 void indi_list_del(
     struct indi_list_s *o,
     int idx
+);
+
+bool indi_list_iterate(
+    struct indi_list_iter_s *i,
+    int *idx,
+    indi_object_t **object
 );
 
 struct indi_object_s *indi_list_get(
