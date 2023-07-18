@@ -298,7 +298,7 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
-        if(CHECK(JSON_TOKEN_COLON) == false)
+        if(CHECK(JSON_TOKEN_STRING) == false)
         {
             ////_free(key);
 
@@ -354,7 +354,7 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
         /*------------------------------------------------------------------------------------------------------------*/
 
-        if(CHECK(JSON_TOKEN_COMMA) == true)
+        if(CHECK(JSON_TOKEN_COMMA))
         {
             NEXT();
 
@@ -389,6 +389,11 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
     return result;
 
 _err:
+    if(CHECK(JSON_TOKEN_NUMBER) || CHECK(JSON_TOKEN_STRING))
+    {
+        indi_free(PEEK().val);
+    }
+
     indi_dict_free(result);
 
     return NULL;
@@ -443,7 +448,7 @@ static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-rec
 
         /*------------------------------------------------------------------------------------------------------------*/
 
-        if(CHECK(JSON_TOKEN_COMMA) == true)
+        if(CHECK(JSON_TOKEN_COMMA))
         {
             NEXT();
 
@@ -477,6 +482,11 @@ static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-rec
     return result;
 
 _err:
+    if(CHECK(JSON_TOKEN_NUMBER) || CHECK(JSON_TOKEN_STRING))
+    {
+        indi_free(PEEK().val);
+    }
+
     indi_list_free(result);
 
     return NULL;

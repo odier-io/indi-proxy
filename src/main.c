@@ -15,6 +15,16 @@ int main()
 
     printf("%s\n", json);
 
+    indi_object_t *test = indi_json_parse(json);
+
+    buff_t json2 = indi_object_to_string(test);
+
+    printf("%s\n", json2);
+
+    indi_free(json2);
+
+    indi_object_free(test);
+
     indi_free(json);
 
     if(indi_validation_free() != 0)
