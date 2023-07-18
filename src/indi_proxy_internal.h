@@ -54,10 +54,6 @@ str_t indi_dbldup(
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-buff_t indi_object_new(
-    enum indi_type_e type
-);
-
 void indi_object_free(
     buff_t object
 );

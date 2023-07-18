@@ -121,37 +121,6 @@ str_t indi_dbldup(double d)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-buff_t indi_object_new(indi_type_t type)
-{
-    switch(type)
-    {
-        case INDI_TYPE_NULL:
-            return (buff_t) indi_null_new();
-
-        case INDI_TYPE_NUMBER:
-            return (buff_t) indi_number_new();
-
-        case INDI_TYPE_BOOLEAN:
-            return (buff_t) indi_boolean_new();
-
-        case INDI_TYPE_STRING:
-            return (buff_t) indi_string_new();
-
-        case INDI_TYPE_LIST:
-            return (buff_t) indi_list_new();
-
-        case INDI_TYPE_DICT:
-            return (buff_t) indi_dict_new();
-
-        default:
-            fprintf(stderr, "Internal error!\n");
-            fflush(stderr);
-            exit(1);
-    }
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
 void indi_object_free(buff_t buff)
 {
     indi_object_t *o = buff;
