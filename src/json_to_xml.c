@@ -18,14 +18,19 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
     for(indi_dict_iter_t iter = INDI_DICT_ITER(dict); indi_dict_iterate(&iter, &key, &object);)
     {
+        /*------------------------------------------------------------------------------------------------------------*/
+
         /**/ if(key[0] == "$")
         {
             str_t val = indi_object_to_cstring(object);
 
-            xmlNodeSetContent(node, BAD_CAST val);
+            xmlNodeSetContent(node, /*--------*/ BAD_CAST val);
 
             indi_free(val);
         }
+
+        /*------------------------------------------------------------------------------------------------------------*/
+
         else if(key[0] == '@')
         {
             str_t val = indi_object_to_cstring(object);
@@ -34,10 +39,15 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
             indi_free(val);
         }
+
+        /*------------------------------------------------------------------------------------------------------------*/
+
         else
         {
 
         }
+
+        /*------------------------------------------------------------------------------------------------------------*/
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
