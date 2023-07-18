@@ -50,7 +50,7 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, void *curr_node_ptr) // NOLIN
 
     for(xmlNode *new_node = curr_node->children; new_node != NULL; new_node = new_node->next)
     {
-        if(new_node->type != XML_TEXT_NODE)
+        if(new_node->type == XML_ELEMENT_NODE)
         {
             /*--------------------------------------------------------------------------------------------------------*/
 
