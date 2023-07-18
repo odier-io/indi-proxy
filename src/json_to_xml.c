@@ -44,7 +44,25 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
         else
         {
+            xmlNodePtr the_node = NULL;
 
+            for(xmlNode *new_node = xmlFirstElementChild(node); new_node; new_node = xmlNextElementSibling(new_node))
+            {
+                if(strcmp((STR_t) new_node->name, key) == 0)
+                {
+                    the_node = new_node;
+
+                    break;
+                }
+            }
+
+            if(the_node == NULL)
+            {
+                the_node = xmlNewChild(node, NULL, BAD_CAST key, NULL);
+            }
+
+
+            /* TODO */
         }
 
         /*------------------------------------------------------------------------------------------------------------*/
