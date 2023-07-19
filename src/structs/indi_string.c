@@ -18,30 +18,30 @@ indi_string_t *indi_string_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_string_t *o = indi_alloc(sizeof(indi_string_t));
+    indi_string_t *obj = indi_alloc(sizeof(indi_string_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    o->object.magic = 0x65656565;
-    o->object.type = INDI_TYPE_STRING;
+    obj->object.magic = 0x65656565;
+    obj->object.type = INDI_TYPE_STRING;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    o->head = NULL;
-    o->tail = NULL;
+    obj->head = NULL;
+    obj->tail = NULL;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return o;
+    return obj;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_string_free(indi_string_t *o)
+void indi_string_free(indi_string_t *obj)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *node = o->head; node != NULL;)
+    for(node_t *node = obj->head; node != NULL;)
     {
         node_t *temp = node;
 
@@ -54,14 +54,14 @@ void indi_string_free(indi_string_t *o)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_free(o);
+    indi_free(obj);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_string_append(indi_string_t *o, STR_t data)
+void indi_string_append(indi_string_t *obj, STR_t data)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -84,15 +84,15 @@ void indi_string_append(indi_string_t *o, STR_t data)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(o->head == NULL)
+    if(obj->head == NULL)
     {
-        o->head = node;
-        o->tail = node;
+        obj->head = node;
+        obj->tail = node;
     }
     else
     {
-        o->tail->next = node;
-        o->tail /*-*/ = node;
+        obj->tail->next = node;
+        obj->tail /*-*/ = node;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
@@ -100,13 +100,13 @@ void indi_string_append(indi_string_t *o, STR_t data)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-size_t indi_string_length(indi_string_t *o)
+size_t indi_string_length(indi_string_t *obj)
 {
     size_t length = 0;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *node = o->head; node != NULL; node = node->next)
+    for(node_t *node = obj->head; node != NULL; node = node->next)
     {
         length += strlen((str_t) (node + 1));
     }
@@ -118,11 +118,11 @@ size_t indi_string_length(indi_string_t *o)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static str_t string_to_string(indi_string_t *o, bool json_string)
+static str_t to_string(indi_string_t *obj, bool json_string)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    size_t length = indi_string_length(o);
+    size_t length = indi_string_length(obj);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -136,7 +136,7 @@ static str_t string_to_string(indi_string_t *o, bool json_string)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *node = o->head; node != NULL; node = node->next)
+    for(node_t *node = obj->head; node != NULL; node = node->next)
     {
         size_t size = strlen((str_t) (node + 1));
 
@@ -160,16 +160,16 @@ static str_t string_to_string(indi_string_t *o, bool json_string)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_string_to_string(indi_string_t *o)
+str_t indi_string_to_string(indi_string_t *obj)
 {
-    return string_to_string(o, true);
+    return to_string(obj, true);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_string_to_cstring(indi_string_t *o)
+str_t indi_string_to_cstring(indi_string_t *obj)
 {
-    return string_to_string(o, false);
+    return to_string(obj, false);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

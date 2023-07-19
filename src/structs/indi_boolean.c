@@ -8,48 +8,48 @@ indi_boolean_t *indi_boolean_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_boolean_t *o = indi_alloc(sizeof(indi_boolean_t));
+    indi_boolean_t *obj = indi_alloc(sizeof(indi_boolean_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
     
-    o->object.magic = 0x65656565;
-    o->object.type = INDI_TYPE_BOOLEAN;
+    obj->object.magic = 0x65656565;
+    obj->object.type = INDI_TYPE_BOOLEAN;
     
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    o->data = false;
+    obj->data = false;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return o;
+    return obj;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_boolean_free(indi_boolean_t *o)
+void indi_boolean_free(indi_boolean_t *obj)
 {
-    indi_free(o);
+    indi_free(obj);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_boolean_get(indi_boolean_t *o)
+bool indi_boolean_get(indi_boolean_t *obj)
 {
-    return o->data;
+    return obj->data;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_boolean_set(indi_boolean_t *o, bool data)
+void indi_boolean_set(indi_boolean_t *obj, bool data)
 {
-    o->data = data;
+    obj->data = data;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_boolean_to_string(indi_boolean_t *o)
+str_t indi_boolean_to_string(indi_boolean_t *obj)
 {
-    return indi_boolean_dup(o->data);
+    return indi_boolean_dup(obj->data);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

@@ -26,12 +26,12 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
 
     for(xmlAttr *attribute = curr_node->properties; attribute != NULL; attribute = attribute->next)
     {
-        indi_string_t *o = indi_string_new();
+        indi_string_t *obj = indi_string_new();
 
-        /**/    indi_string_append(o, /*-----*/ "@" /*-----*/);
-        /**/    indi_string_append(o, (str_t) attribute->name);
+        /**/    indi_string_append(obj, /*-----*/ "@" /*-----*/);
+        /**/    indi_string_append(obj, (str_t) attribute->name);
         /**/
-        /**/    str_t attribute_name = indi_string_to_cstring(o);
+        /**/    str_t attribute_name = indi_string_to_cstring(obj);
         /**/
         /**/    /**/    xmlChar *attribute_val = xmlNodeListGetString(curr_node->doc, attribute->children, 1);
         /**/    /**/
@@ -41,7 +41,7 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
         /**/
         /**/    indi_free(attribute_name);
 
-        indi_string_free(o);
+        indi_string_free(obj);
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
@@ -78,46 +78,41 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
 
 str_t indi_xml_to_json(STR_t xml, bool validate)
 {
-    str_t result = NULL;
-
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlDoc *doc = xmlReadMemory(xml, (int) strlen(xml), "message.xml", "utf-8", 0);
+    xmlDoc *doc = xmlReadMemory(xml, strlen(xml), "message.xml", "iso-8859-1", 0);
 
-    if(doc != NULL)
+    if(doc == NULL)
     {
-        if(validate && indi_validation_check(doc) == false)
-        {
-            goto _err1;
-        }
-    }
-    else
-    {
-        goto _err0;
+        return NULL;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlNode *root = xmlDocGetRootElement(doc);
-
-    if(root != NULL)
+    if(validate && indi_validation_check(doc) == false)
     {
-        indi_dict_t *dict = indi_dict_new();
+        xmlFreeDoc(doc);
 
-        result = indi_dict_to_string(
-            xml_to_json(dict, root)
-        );
-
-        indi_dict_free(dict);
+        return NULL;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-_err1:
+    indi_dict_t *dict = xml_to_json(indi_dict_new(), xmlDocGetRootElement(doc));
+
+    str_t result = indi_dict_to_string(dict);
+
+    indi_dict_free(dict);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     xmlFreeDoc(doc);
 
-_err0:
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     return result;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

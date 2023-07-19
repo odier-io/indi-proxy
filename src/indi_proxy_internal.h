@@ -34,12 +34,17 @@ typedef struct indi_object_s
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+size_t indi_free(
+    buff_t buff
+);
+
 buff_t indi_alloc(
     size_t size
 );
 
-void indi_free(
-    buff_t buff
+buff_t indi_realloc(
+    buff_t buff,
+    size_t size
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -85,11 +90,11 @@ typedef struct indi_null_s
 struct indi_null_s *indi_null_new();
 
 void indi_null_free(
-    struct indi_null_s *o
+    struct indi_null_s *obj
 );
 
 str_t indi_null_to_string(
-    struct indi_null_s *o
+    struct indi_null_s *obj
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -109,20 +114,20 @@ typedef struct indi_number_s
 struct indi_number_s *indi_number_new();
 
 void indi_number_free(
-    struct indi_number_s *o
+    struct indi_number_s *obj
 );
 
 double indi_number_get(
-    struct indi_number_s *o
+    struct indi_number_s *obj
 );
 
 void indi_number_set(
-    struct indi_number_s *o,
+    struct indi_number_s *obj,
     double data
 );
 
 str_t indi_number_to_string(
-    struct indi_number_s *o
+    struct indi_number_s *obj
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -153,20 +158,20 @@ typedef struct indi_boolean_s
 struct indi_boolean_s *indi_boolean_new();
 
 void indi_boolean_free(
-    struct indi_boolean_s *o
+    struct indi_boolean_s *obj
 );
 
 bool indi_boolean_get(
-    struct indi_boolean_s *o
+    struct indi_boolean_s *obj
 );
 
 void indi_boolean_set(
-    struct indi_boolean_s *o,
+    struct indi_boolean_s *obj,
     bool data
 );
 
 str_t indi_boolean_to_string(
-    struct indi_boolean_s *o
+    struct indi_boolean_s *bj
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -198,24 +203,24 @@ typedef struct indi_string_s
 struct indi_string_s *indi_string_new();
 
 void indi_string_free(
-    struct indi_string_s *o
+    struct indi_string_s *obj
 );
 
 void indi_string_append(
-    struct indi_string_s *o,
+    struct indi_string_s *obj,
     STR_t data
 );
 
 size_t indi_string_length(
-    struct indi_string_s *o
+    struct indi_string_s *obj
 );
 
 str_t indi_string_to_string(
-    struct indi_string_s *o
+    struct indi_string_s *obj
 );
 
 str_t indi_string_to_cstring(
-    struct indi_string_s *o
+    struct indi_string_s *obj
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -256,41 +261,41 @@ typedef struct indi_dict_iter_s
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-#define INDI_DICT_ITER(o) \
-                {0, ((struct indi_dict_s *) (o))->object.type, ((struct indi_dict_s *) (o))->head}
+#define INDI_DICT_ITER(obj) \
+                {0, ((struct indi_dict_s *) (obj))->object.type, ((struct indi_dict_s *) (obj))->head}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 indi_dict_t *indi_dict_new();
 
 void indi_dict_free(
-    struct indi_dict_s *o
+    struct indi_dict_s *obj
 );
 
 void indi_dict_del(
-    struct indi_dict_s *o,
+    struct indi_dict_s *obj,
     STR_t key
 );
 
 bool indi_dict_iterate(
     struct indi_dict_iter_s *i,
     STR_t *key,
-    indi_object_t **object
+    indi_object_t **obj
 );
 
 struct indi_object_s *indi_dict_get(
-    struct indi_dict_s *o,
+    struct indi_dict_s *obj,
     STR_t key
 );
 
 void indi_dict_put(
-    struct indi_dict_s *o,
+    struct indi_dict_s *obj,
     STR_t key,
     buff_t val
 );
 
 str_t indi_dict_to_string(
-    struct indi_dict_s *o
+    struct indi_dict_s *obj
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -320,40 +325,40 @@ typedef struct indi_list_iter_s
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-#define INDI_LIST_ITER(o) \
-                {0, ((struct indi_list_s *) (o))->object.type, ((struct indi_list_s *) (o))->head}
+#define INDI_LIST_ITER(obj) \
+                {0, ((struct indi_list_s *) (obj))->object.type, ((struct indi_list_s *) (obj))->head}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 struct indi_list_s *indi_list_new();
 
 void indi_list_free(
-    struct indi_list_s *o
+    struct indi_list_s *obj
 );
 
 void indi_list_del(
-    struct indi_list_s *o,
+    struct indi_list_s *obj,
     int idx
 );
 
 bool indi_list_iterate(
     struct indi_list_iter_s *i,
     int *idx,
-    indi_object_t **object
+    indi_object_t **obj
 );
 
 struct indi_object_s *indi_list_get(
-    struct indi_list_s *o,
+    struct indi_list_s *obj,
     int idx
 );
 
 struct indi_list_s *indi_list_push(
-    struct indi_list_s *o,
+    struct indi_list_s *obj,
     buff_t val
 );
 
 str_t indi_list_to_string(
-    struct indi_list_s *o
+    struct indi_list_s *obj
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/

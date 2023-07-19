@@ -18,30 +18,30 @@ indi_list_t *indi_list_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_list_t *o = indi_alloc(sizeof(indi_list_t));
+    indi_list_t *obj = indi_alloc(sizeof(indi_list_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    o->object.magic = 0x65656565;
-    o->object.type = INDI_TYPE_LIST;
+    obj->object.magic = 0x65656565;
+    obj->object.type = INDI_TYPE_LIST;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    o->head = NULL;
-    o->tail = NULL;
+    obj->head = NULL;
+    obj->tail = NULL;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return o;
+    return obj;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_list_free(indi_list_t *o)
+void indi_list_free(indi_list_t *obj)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *node = o->head; node != NULL;)
+    for(node_t *node = obj->head; node != NULL;)
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
@@ -60,20 +60,20 @@ void indi_list_free(indi_list_t *o)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_free(o);
+    indi_free(obj);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_list_del(indi_list_t *o, int idx)
+void indi_list_del(indi_list_t *obj, int idx)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
     int i = 0;
 
-    for(node_t *prev_node = NULL, *curr_node = o->head; curr_node != NULL; prev_node = curr_node, curr_node = curr_node->next)
+    for(node_t *prev_node = NULL, *curr_node = obj->head; curr_node != NULL; prev_node = curr_node, curr_node = curr_node->next)
     {
         if(idx == i++)
         {
@@ -81,7 +81,7 @@ void indi_list_del(indi_list_t *o, int idx)
 
             if(prev_node == NULL)
             {
-                o->head = curr_node->next;
+                obj->head = curr_node->next;
             }
             else
             {
@@ -105,7 +105,7 @@ void indi_list_del(indi_list_t *o, int idx)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_list_iterate(indi_list_iter_t *i, int *idx, indi_object_t **object)
+bool indi_list_iterate(indi_list_iter_t *i, int *idx, indi_object_t **obj)
 {
     if(i->type == INDI_TYPE_LIST && i->head != NULL)
     {
@@ -113,8 +113,8 @@ bool indi_list_iterate(indi_list_iter_t *i, int *idx, indi_object_t **object)
             *idx = i->idx;
         }
 
-        if(object != NULL) {
-            *object = i->head->val;
+        if(obj != NULL) {
+            *obj = i->head->val;
         }
 
         i->idx += 0x0000000001;
@@ -128,13 +128,13 @@ bool indi_list_iterate(indi_list_iter_t *i, int *idx, indi_object_t **object)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_object_t *indi_list_get(indi_list_t *o, int idx)
+indi_object_t *indi_list_get(indi_list_t *obj, int idx)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
     int i = 0;
 
-    for(node_t *curr_node = o->head; curr_node != NULL; curr_node = curr_node->next)
+    for(node_t *curr_node = obj->head; curr_node != NULL; curr_node = curr_node->next)
     {
         if(idx == i++)
         {
@@ -149,7 +149,7 @@ indi_object_t *indi_list_get(indi_list_t *o, int idx)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_list_t *indi_list_push(struct indi_list_s *o, buff_t val)
+indi_list_t *indi_list_push(struct indi_list_s *obj, buff_t val)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -160,31 +160,31 @@ indi_list_t *indi_list_push(struct indi_list_s *o, buff_t val)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(o->head == NULL)
+    if(obj->head == NULL)
     {
-        o->head = node;
-        o->tail = node;
+        obj->head = node;
+        obj->tail = node;
     }
     else
     {
-        o->tail->next = node;
-        o->tail /*-*/ = node;
+        obj->tail->next = node;
+        obj->tail /*-*/ = node;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return o;
+    return obj;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_list_to_string(indi_list_t *o)
+str_t indi_list_to_string(indi_list_t *obj)
 {
     indi_string_t *sb = indi_string_new();
 
     /**/    indi_string_append(sb, "[");
     /**/
-    /**/    for(node_t *curr_node = o->head; curr_node != NULL; curr_node = curr_node->next)
+    /**/    for(node_t *curr_node = obj->head; curr_node != NULL; curr_node = curr_node->next)
     /**/    {
     /**/        str_t curr_node_val = indi_object_to_string(curr_node->val);
     /**/

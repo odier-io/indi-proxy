@@ -22,30 +22,30 @@ indi_dict_t *indi_dict_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_dict_t *o = indi_alloc(sizeof(indi_dict_t));
+    indi_dict_t *obj = indi_alloc(sizeof(indi_dict_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    o->object.magic = 0x65656565;
-    o->object.type = INDI_TYPE_DICT;
+    obj->object.magic = 0x65656565;
+    obj->object.type = INDI_TYPE_DICT;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    o->head = NULL;
-    o->tail = NULL;
+    obj->head = NULL;
+    obj->tail = NULL;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return o;
+    return obj;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_dict_free(indi_dict_t *o)
+void indi_dict_free(indi_dict_t *obj)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *node = o->head; node != NULL;)
+    for(node_t *node = obj->head; node != NULL;)
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
@@ -64,18 +64,18 @@ void indi_dict_free(indi_dict_t *o)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_free(o);
+    indi_free(obj);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_dict_del(indi_dict_t *o, STR_t key)
+void indi_dict_del(indi_dict_t *obj, STR_t key)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *prev_node = NULL, *curr_node = o->head; curr_node != NULL; prev_node = curr_node, curr_node = curr_node->next)
+    for(node_t *prev_node = NULL, *curr_node = obj->head; curr_node != NULL; prev_node = curr_node, curr_node = curr_node->next)
     {
         if(strcmp(curr_node->key, key) == 0)
         {
@@ -83,7 +83,7 @@ void indi_dict_del(indi_dict_t *o, STR_t key)
 
             if(prev_node == NULL)
             {
-                o->head = curr_node->next;
+                obj->head = curr_node->next;
             }
             else
             {
@@ -107,7 +107,7 @@ void indi_dict_del(indi_dict_t *o, STR_t key)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_dict_iterate(indi_dict_iter_t *i, STR_t *key, indi_object_t **object)
+bool indi_dict_iterate(indi_dict_iter_t *i, STR_t *key, indi_object_t **obj)
 {
     if(i->type == INDI_TYPE_DICT && i->head != NULL)
     {
@@ -115,8 +115,8 @@ bool indi_dict_iterate(indi_dict_iter_t *i, STR_t *key, indi_object_t **object)
             *key = i->head->key;
         }
 
-        if(object != NULL) {
-            *object = i->head->val;
+        if(obj != NULL) {
+            *obj = i->head->val;
         }
 
         i->idx += 0x0000000001;
@@ -130,11 +130,11 @@ bool indi_dict_iterate(indi_dict_iter_t *i, STR_t *key, indi_object_t **object)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_object_t *indi_dict_get(indi_dict_t *o, STR_t key)
+indi_object_t *indi_dict_get(indi_dict_t *obj, STR_t key)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *curr_node = o->head; curr_node != NULL; curr_node = curr_node->next)
+    for(node_t *curr_node = obj->head; curr_node != NULL; curr_node = curr_node->next)
     {
         if(strcmp(curr_node->key, key) == 0)
         {
@@ -149,11 +149,11 @@ indi_object_t *indi_dict_get(indi_dict_t *o, STR_t key)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_dict_put(indi_dict_t *o, STR_t key, buff_t val)
+void indi_dict_put(indi_dict_t *obj, STR_t key, buff_t val)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(node_t *curr_node = o->head; curr_node != NULL; curr_node = curr_node->next)
+    for(node_t *curr_node = obj->head; curr_node != NULL; curr_node = curr_node->next)
     {
         if(strcmp(curr_node->key, key) == 0)
         {
@@ -176,15 +176,15 @@ void indi_dict_put(indi_dict_t *o, STR_t key, buff_t val)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(o->head == NULL)
+    if(obj->head == NULL)
     {
-        o->head = node;
-        o->tail = node;
+        obj->head = node;
+        obj->tail = node;
     }
     else
     {
-        o->tail->next = node;
-        o->tail /*-*/ = node;
+        obj->tail->next = node;
+        obj->tail /*-*/ = node;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
@@ -192,13 +192,13 @@ void indi_dict_put(indi_dict_t *o, STR_t key, buff_t val)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_dict_to_string(indi_dict_t *o)
+str_t indi_dict_to_string(indi_dict_t *obj)
 {
     indi_string_t *string = indi_string_new();
 
     /**/    indi_string_append(string, "{");
     /**/
-    /**/    for(node_t *curr_node = o->head; curr_node != NULL; curr_node = curr_node->next)
+    /**/    for(node_t *curr_node = obj->head; curr_node != NULL; curr_node = curr_node->next)
     /**/    {
     /**/        str_t curr_node_val = indi_object_to_string(curr_node->val);
     /**/

@@ -495,9 +495,14 @@ indi_object_t *indi_json_parse(STR_t json)
 {
     indi_object_t *result;
 
+    if(json == NULL)
+    {
+        return NULL;
+    }
+
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    json_parser_t _parser = {};
+    json_parser_t _parser;
 
     json_parser_t *parser = &_parser;
 
