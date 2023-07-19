@@ -22,8 +22,8 @@ indi_string_t *indi_string_new()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    obj->object.magic = 0x65656565;
-    obj->object.type = INDI_TYPE_STRING;
+    obj->base.magic = 0x65656565;
+    obj->base.type = INDI_TYPE_STRING;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -126,7 +126,7 @@ static str_t to_string(indi_string_t *obj, bool json_string)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    str_t result = indi_alloc(length + 2 + 1);
+    str_t result = indi_alloc(length + 3);
 
     str_t p = result;
 

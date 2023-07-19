@@ -64,15 +64,15 @@ str_t indi_string_dup(
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 void indi_object_free(
-    buff_t object
+    buff_t buff
 );
 
 str_t indi_object_to_string(
-    buff_t object
+    buff_t buff
 );
 
 str_t indi_object_to_cstring(
-    buff_t object
+    buff_t buff
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -81,7 +81,7 @@ str_t indi_object_to_cstring(
 
 typedef struct indi_null_s
 {
-    struct indi_object_s object;
+    struct indi_object_s base;
 
 } indi_null_t;
 
@@ -103,7 +103,7 @@ str_t indi_null_to_string(
 
 typedef struct indi_number_s
 {
-    struct indi_object_s object;
+    struct indi_object_s base;
 
     double data;
 
@@ -147,7 +147,7 @@ static inline struct indi_number_s *indi_number_from(double data)
 
 typedef struct indi_boolean_s
 {
-    struct indi_object_s object;
+    struct indi_object_s base;
 
     bool data;
 
@@ -171,7 +171,7 @@ void indi_boolean_set(
 );
 
 str_t indi_boolean_to_string(
-    struct indi_boolean_s *bj
+    struct indi_boolean_s *obj
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -191,7 +191,7 @@ static inline struct indi_boolean_s *indi_boolean_from(bool data)
 
 typedef struct indi_string_s
 {
-    struct indi_object_s object;
+    struct indi_object_s base;
 
     struct indi_string_node_s *head;
     struct indi_string_node_s *tail;
@@ -240,7 +240,7 @@ static inline struct indi_string_s *indi_string_from(STR_t data)
 
 typedef struct indi_dict_s
 {
-    struct indi_object_s object;
+    struct indi_object_s base;
 
     struct indi_dict_node_s *head;
     struct indi_dict_node_s *tail;
@@ -262,7 +262,7 @@ typedef struct indi_dict_iter_s
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define INDI_DICT_ITER(obj) \
-                {0, ((struct indi_dict_s *) (obj))->object.type, ((struct indi_dict_s *) (obj))->head}
+                {0, ((struct indi_dict_s *) (obj))->base.type, ((struct indi_dict_s *) (obj))->head}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -304,7 +304,7 @@ str_t indi_dict_to_string(
 
 typedef struct indi_list_s
 {
-    struct indi_object_s object;
+    struct indi_object_s base;
 
     struct indi_list_node_s *head;
     struct indi_list_node_s *tail;
@@ -326,7 +326,7 @@ typedef struct indi_list_iter_s
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define INDI_LIST_ITER(obj) \
-                {0, ((struct indi_list_s *) (obj))->object.type, ((struct indi_list_s *) (obj))->head}
+                {0, ((struct indi_list_s *) (obj))->base.type, ((struct indi_list_s *) (obj))->head}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 

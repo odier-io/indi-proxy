@@ -13,7 +13,7 @@ int main()
 {
     xmlMemSetup(indi_free2, indi_alloc, indi_realloc, indi_string_dup);
 
-    if(indi_validation_init() != 0)
+    if(indi_validation_init() == false)
     {
         printf("Error initializing validation\n");
     }
@@ -40,7 +40,7 @@ int main()
     indi_free(json2);
     indi_free(json1);
 
-    if(indi_validation_free() != 0)
+    if(indi_validation_free() == false)
     {
         printf("Error finalizing validation\n");
     }

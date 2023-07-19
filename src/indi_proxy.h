@@ -31,9 +31,9 @@ void indi_memory_report();
 /* VALIDATION                                                                                                         */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-int indi_validation_init();
+bool indi_validation_init();
 
-int indi_validation_free();
+bool indi_validation_free();
 
 bool indi_validation_check(
     struct _xmlDoc *doc

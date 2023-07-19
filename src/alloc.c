@@ -213,7 +213,7 @@ void indi_object_free(buff_t buff)
 
     if(obj->magic != 0x65656565)
     {
-        fprintf(stderr, "Invalid object!\n");
+        fprintf(stderr, "Invalid base!\n");
         fflush(stderr);
         exit(1);
     }
@@ -264,7 +264,7 @@ str_t indi_object_to_string(buff_t buff)
 
     if(obj->magic != 0x65656565)
     {
-        fprintf(stderr, "Invalid object!\n");
+        fprintf(stderr, "Invalid base!\n");
         fflush(stderr);
         exit(1);
     }
@@ -309,7 +309,7 @@ str_t indi_object_to_cstring(buff_t buff)
 
     if(obj->magic != 0x65656565)
     {
-        fprintf(stderr, "Invalid object!\n");
+        fprintf(stderr, "Invalid base!\n");
         fflush(stderr);
         exit(1);
     }

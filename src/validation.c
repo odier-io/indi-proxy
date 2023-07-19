@@ -14,7 +14,7 @@ static xmlSchema *INDI_SCHEMA = NULL;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-int indi_validation_init()
+bool indi_validation_init()
 {
     xmlSchemaParserCtxt *context = xmlSchemaNewMemParserCtxt(indi_proxy_xsd_buff, INDI_PROXY_XSD_SIZE);
 
@@ -40,23 +40,21 @@ int indi_validation_init()
 
     xmlSchemaFreeParserCtxt(context);
 
-    return INDI_SCHEMA == NULL ? 1
-                               : 0
-    ;
+    return INDI_SCHEMA != NULL;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-int indi_validation_free()
+bool indi_validation_free()
 {
     if(INDI_SCHEMA != NULL)
     {
         xmlSchemaFree(INDI_SCHEMA);
 
-        return 0;
+        return true;
     }
 
-    return 1;
+    return false;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
