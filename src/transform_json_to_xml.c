@@ -20,7 +20,18 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
     {
         /*------------------------------------------------------------------------------------------------------------*/
 
-        /**/ if(key[0] == '$')
+        /**/ if(strcmp(key, "<>") == 0)
+        {
+            str_t val = indi_object_to_cstring(obj1);
+
+            xmlNodeSetName(node, /*--------*/ BAD_CAST val);
+
+            indi_free(val);
+        }
+
+        /*------------------------------------------------------------------------------------------------------------*/
+
+        else if(strcmp(key, "$") == 0)
         {
             str_t val = indi_object_to_cstring(obj1);
 
@@ -42,7 +53,7 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
         /*------------------------------------------------------------------------------------------------------------*/
 
-        else
+        else if(strcmp(key, "children") == 0)
         {
             int idx;
 
@@ -50,7 +61,7 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
             for(indi_list_iter_t iter2 = INDI_LIST_ITER(obj1); indi_list_iterate(&iter2, &idx, &obj2);)
             {
-                json_to_xml(xmlNewChild(node, NULL, BAD_CAST key, NULL), (indi_dict_t *) obj2);
+                json_to_xml(xmlNewChild(node, NULL, BAD_CAST "", NULL), (indi_dict_t *) obj2);
             }
         }
 
@@ -94,7 +105,7 @@ str_t indi_json_to_xml(STR_t json, bool validate)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlDoc *doc = xmlNewDoc(BAD_CAST "1.0"); xmlDocSetRootElement(doc, json_to_xml(xmlNewNode(NULL, BAD_CAST "defSwitchVector"), dict));
+    xmlDoc *doc = xmlNewDoc(BAD_CAST "1.0"); xmlDocSetRootElement(doc, json_to_xml(xmlNewNode(NULL, BAD_CAST ""), dict));
 
     result = validate == false || indi_validation_check(doc) == true ? xmlDump(doc) : NULL;
 

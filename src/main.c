@@ -32,7 +32,7 @@ int main()
 
     printf("json2: %s\n\n", json2);
 
-    str_t xml2 = indi_json_to_xml(json2, true);
+    str_t xml2 = indi_json_to_xml(json2, false);
 
     printf("xml2: %s\n\n", xml2);
 
