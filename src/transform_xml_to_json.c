@@ -79,7 +79,7 @@ static indi_dict_t *xml_to_json(xmlNode *curr_node) // NOLINT(misc-no-recursion)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_object_t *indi_xml_to_object(indi_xmldoc_t *doc, bool validate)
+indi_object_t *indi_xmldoc_to_object(indi_xmldoc_t *doc, bool validate)
 {
     if(doc == NULL)
     {
@@ -88,9 +88,18 @@ indi_object_t *indi_xml_to_object(indi_xmldoc_t *doc, bool validate)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    xmlNode *root = xmlDocGetRootElement(doc);
+
+    if(root == NULL)
+    {
+        return NULL;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     if(validate == false || indi_validation_check(doc) == true)
     {
-        return (indi_object_t *) xml_to_json(xmlDocGetRootElement(doc));
+        return (indi_object_t *) xml_to_json(root);
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/

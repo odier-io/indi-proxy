@@ -15,7 +15,7 @@ indi_xmldoc_t *indi_xml_parse(STR_t text)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_xml_free(indi_xmldoc_t *doc)
+void indi_xmldoc_free(indi_xmldoc_t *doc)
 {
     if(doc != NULL)
     {

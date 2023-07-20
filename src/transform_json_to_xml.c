@@ -8,7 +8,7 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static xmlNode *json_to_xml(indi_dict_t *dict) // NOLINT(misc-no-recursion)
+static xmlNode *json_to_xml(indi_object_t *dict) // NOLINT(misc-no-recursion)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -65,7 +65,7 @@ static xmlNode *json_to_xml(indi_dict_t *dict) // NOLINT(misc-no-recursion)
 
             for(indi_list_iter_t iter2 = INDI_LIST_ITER(obj1); indi_list_iterate(&iter2, &idx, &obj2);)
             {
-                json_to_xml((indi_dict_t *) obj2);
+                xmlAddChild(node, json_to_xml(obj2));
             }
         }
 
@@ -79,7 +79,7 @@ static xmlNode *json_to_xml(indi_dict_t *dict) // NOLINT(misc-no-recursion)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_xmldoc_t *indi_object_to_xml(indi_object_t *obj, bool validate)
+indi_xmldoc_t *indi_object_to_xmldoc(indi_object_t *obj, bool validate)
 {
     if(obj == NULL)
     {
@@ -88,7 +88,18 @@ indi_xmldoc_t *indi_object_to_xml(indi_object_t *obj, bool validate)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_xmldoc_t *xml = xmlNewDoc(BAD_CAST "1.0"); xmlDocSetRootElement(xml, json_to_xml((indi_dict_t *) obj));
+    xmlNode *root = json_to_xml(obj);
+
+    if(root == NULL)
+    {
+        return NULL;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    indi_xmldoc_t *xml = xmlNewDoc(BAD_CAST "1.0");
+
+    xmlDocSetRootElement(xml, root);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 

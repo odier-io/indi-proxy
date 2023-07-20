@@ -12,7 +12,7 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define buff_t /* */ void *
-#define BUFF_t const void *
+/////// BUFF_t const void *
 
 #define str_t /* */ char *
 #define STR_t const char *
@@ -21,7 +21,24 @@
 /* MEMORY                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_memory_report();
+void indi_memory_initialize();
+
+void indi_memory_finalize();
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+size_t indi_free(
+    buff_t buff
+);
+
+buff_t indi_alloc(
+    size_t size
+);
+
+buff_t indi_realloc(
+    buff_t buff,
+    size_t size
+);
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* JSON                                                                                                               */
@@ -78,7 +95,7 @@ indi_xmldoc_t *indi_xml_parse(
     STR_t text
 );
 
-void indi_xml_free(
+void indi_xmldoc_free(
     /*-*/ indi_xmldoc_t *doc
 );
 
@@ -102,12 +119,12 @@ bool indi_validation_check(
 /* TRANSFORM                                                                                                          */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_object_t *indi_xml_to_object(
+indi_object_t *indi_xmldoc_to_object(
     indi_xmldoc_t *doc,
     bool validate
 );
 
-indi_xmldoc_t *indi_object_to_xml(
+indi_xmldoc_t *indi_object_to_xmldoc(
     indi_object_t *obj,
     bool validate
 );
