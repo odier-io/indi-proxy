@@ -105,20 +105,20 @@ void indi_list_del(indi_list_t *obj, int idx)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_list_iterate(indi_list_iter_t *i, int *idx, indi_object_t **obj)
+bool indi_list_iterate(indi_list_iter_t *iter, int *idx, indi_object_t **obj)
 {
-    if(i->type == INDI_TYPE_LIST && i->head != NULL)
+    if(iter->type == INDI_TYPE_LIST && iter->head != NULL)
     {
         if(idx != NULL) {
-            *idx = i->idx;
+            *idx = iter->idx;
         }
 
         if(obj != NULL) {
-            *obj = i->head->val;
+            *obj = iter->head->val;
         }
 
-        i->idx += 0x0000000001;
-        i->head = i->head->next;
+        iter->idx += 0x0000000000001;
+        iter->head = iter->head->next;
 
         return true;
     }

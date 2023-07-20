@@ -12,6 +12,10 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    indi_dict_put(dict, "<>", indi_string_from((str_t) curr_node->name));
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     for(xmlNode *new_node = curr_node->children; new_node != NULL; new_node = new_node->next)
     {
         if(new_node->type == XML_TEXT_NODE && strlen((str_t) new_node->content) > 0)
@@ -46,26 +50,23 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    for(xmlNode *new_node = curr_node->children; new_node != NULL; new_node = new_node->next)
+    if(curr_node->children)
     {
-        if(new_node->type == XML_ELEMENT_NODE)
+        indi_list_t *list = NULL;
+
+        for(xmlNode *new_node = curr_node->children; new_node != NULL; new_node = new_node->next)
         {
-            /*--------------------------------------------------------------------------------------------------------*/
-
-            indi_list_t *list = (indi_list_t *) indi_dict_get(dict, (str_t) new_node->name);
-
-            if(list == NULL)
+            if(new_node->type == XML_ELEMENT_NODE)
             {
-                list = indi_list_new();
+                if(list == NULL)
+                {
+                    list = indi_list_new();
 
-                indi_dict_put(dict, (str_t) new_node->name, list);
+                    indi_dict_put(dict, "children", list);
+                }
+
+                indi_list_push(list, xml_to_json(indi_dict_new(), new_node));
             }
-
-            /*--------------------------------------------------------------------------------------------------------*/
-
-            indi_list_push(list, xml_to_json(indi_dict_new(), new_node));
-
-            /*--------------------------------------------------------------------------------------------------------*/
         }
     }
 

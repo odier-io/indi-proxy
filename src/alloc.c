@@ -253,7 +253,7 @@ void indi_object_free(buff_t buff)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_object_to_string(buff_t buff)
+str_t indi_object_to_string(BUFF_t buff)
 {
     indi_object_t *obj = (indi_object_t *) buff;
 
@@ -298,7 +298,7 @@ str_t indi_object_to_string(buff_t buff)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_object_to_cstring(buff_t buff)
+str_t indi_object_to_cstring(BUFF_t buff)
 {
     indi_object_t *obj = (indi_object_t *) buff;
 

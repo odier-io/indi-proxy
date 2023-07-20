@@ -68,11 +68,11 @@ void indi_object_free(
 );
 
 str_t indi_object_to_string(
-    buff_t buff
+    BUFF_t buff
 );
 
 str_t indi_object_to_cstring(
-    buff_t buff
+    BUFF_t buff
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -262,7 +262,7 @@ typedef struct indi_dict_iter_s
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define INDI_DICT_ITER(obj) \
-                {0, ((struct indi_dict_s *) (obj))->base.type, ((struct indi_dict_s *) (obj))->head}
+                ((struct indi_dict_iter_s) {0, ((struct indi_dict_s *) (obj))->base.type, ((struct indi_dict_s *) (obj))->head})
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -278,7 +278,7 @@ void indi_dict_del(
 );
 
 bool indi_dict_iterate(
-    struct indi_dict_iter_s *i,
+    struct indi_dict_iter_s *iter,
     STR_t *key,
     indi_object_t **obj
 );
@@ -326,7 +326,7 @@ typedef struct indi_list_iter_s
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define INDI_LIST_ITER(obj) \
-                {0, ((struct indi_list_s *) (obj))->base.type, ((struct indi_list_s *) (obj))->head}
+                ((struct indi_list_iter_s) {0, ((struct indi_list_s *) (obj))->base.type, ((struct indi_list_s *) (obj))->head})
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -342,7 +342,7 @@ void indi_list_del(
 );
 
 bool indi_list_iterate(
-    struct indi_list_iter_s *i,
+    struct indi_list_iter_s *iter,
     int *idx,
     indi_object_t **obj
 );

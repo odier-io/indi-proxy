@@ -107,20 +107,20 @@ void indi_dict_del(indi_dict_t *obj, STR_t key)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_dict_iterate(indi_dict_iter_t *i, STR_t *key, indi_object_t **obj)
+bool indi_dict_iterate(indi_dict_iter_t *iter, STR_t *key, indi_object_t **obj)
 {
-    if(i->type == INDI_TYPE_DICT && i->head != NULL)
+    if(iter->type == INDI_TYPE_DICT && iter->head != NULL)
     {
         if(key != NULL) {
-            *key = i->head->key;
+            *key = iter->head->key;
         }
 
         if(obj != NULL) {
-            *obj = i->head->val;
+            *obj = iter->head->val;
         }
 
-        i->idx += 0x0000000001;
-        i->head = i->head->next;
+        iter->idx += 0x0000000000001;
+        iter->head = iter->head->next;
 
         return true;
     }
