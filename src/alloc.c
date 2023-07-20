@@ -202,10 +202,8 @@ str_t indi_string_dup(STR_t s)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_object_free(buff_t buff)
+void indi_object_free(indi_object_t *obj)
 {
-    indi_object_t *obj = buff;
-
     if(obj == NULL)
     {
         return;
@@ -253,10 +251,8 @@ void indi_object_free(buff_t buff)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_object_to_string(BUFF_t buff)
+str_t indi_object_to_string(const indi_object_t *obj)
 {
-    indi_object_t *obj = (indi_object_t *) buff;
-
     if(obj == NULL)
     {
         return NULL;
@@ -298,10 +294,8 @@ str_t indi_object_to_string(BUFF_t buff)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_object_to_cstring(BUFF_t buff)
+str_t indi_object_to_cstring(const indi_object_t *obj)
 {
-    indi_object_t *obj = (indi_object_t *) buff;
-
     if(obj == NULL)
     {
         return NULL;

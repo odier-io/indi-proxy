@@ -10,7 +10,7 @@ typedef struct indi_dict_node_s
 {
     STR_t key;
 
-    struct indi_object_s *val;
+    indi_object_t *val;
 
     struct indi_dict_node_s *next;
 

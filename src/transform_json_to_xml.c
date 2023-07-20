@@ -8,8 +8,12 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-recursion)
+static xmlNode *json_to_xml(indi_dict_t *dict) // NOLINT(misc-no-recursion)
 {
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    xmlNode *node = xmlNewNode(NULL, BAD_CAST "");
+
     /*----------------------------------------------------------------------------------------------------------------*/
 
     STR_t key;
@@ -61,7 +65,7 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
             for(indi_list_iter_t iter2 = INDI_LIST_ITER(obj1); indi_list_iterate(&iter2, &idx, &obj2);)
             {
-                json_to_xml(xmlNewChild(node, NULL, BAD_CAST "", NULL), (indi_dict_t *) obj2);
+                json_to_xml((indi_dict_t *) obj2);
             }
         }
 
@@ -75,51 +79,29 @@ static xmlNode *json_to_xml(xmlNode *node, indi_dict_t *dict) // NOLINT(misc-no-
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static str_t xmlDump(xmlDoc *doc)
+indi_xmldoc_t *indi_object_to_xml(indi_object_t *obj, bool validate)
 {
-    int len;
-
-    str_t result;
-
-    xmlDocDumpMemoryEnc(doc, (xmlChar **) &result, &len, "iso-8859-1");
-
-    memmove(result, result + 44, len - 44 + 1);
-
-    return result;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-str_t indi_json_to_xml(STR_t json, bool validate)
-{
-    str_t result;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    indi_dict_t *dict = (indi_dict_t *) indi_json_parse(json);
-
-    if(dict == NULL)
+    if(obj == NULL)
     {
         return NULL;
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlDoc *doc = xmlNewDoc(BAD_CAST "1.0"); xmlDocSetRootElement(doc, json_to_xml(xmlNewNode(NULL, BAD_CAST ""), dict));
-
-    result = validate == false || indi_validation_check(doc) == true ? xmlDump(doc) : NULL;
-
-    xmlFreeDoc(doc);
+    indi_xmldoc_t *xml = xmlNewDoc(BAD_CAST "1.0"); xmlDocSetRootElement(xml, json_to_xml((indi_dict_t *) obj));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_object_free(dict);
+    if(validate == true && indi_validation_check(xml) == false)
+    {
+        xmlFreeDoc(xml);
+
+        return NULL;
+    }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return result;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
+    return xml;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

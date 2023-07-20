@@ -490,11 +490,11 @@ _err:
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_object_t *indi_json_parse(STR_t json)
+indi_object_t *indi_json_parse(STR_t text)
 {
     indi_object_t *result;
 
-    if(json == NULL)
+    if(text == NULL)
     {
         return NULL;
     }
@@ -507,7 +507,7 @@ indi_object_t *indi_json_parse(STR_t json)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    parser->pos = json;
+    parser->pos = text;
 
     parser->curr_token.val = NULL;
 

@@ -8,11 +8,15 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT(misc-no-recursion)
+static indi_dict_t *xml_to_json(xmlNode *curr_node) // NOLINT(misc-no-recursion)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_dict_put(dict, "<>", indi_string_from((str_t) curr_node->name));
+    indi_dict_t *result = indi_dict_new();
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    indi_dict_put(result, "<>", indi_string_from((str_t) curr_node->name));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -20,7 +24,7 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
     {
         if(new_node->type == XML_TEXT_NODE && strlen((str_t) new_node->content) > 0)
         {
-            indi_dict_put(dict, "$", indi_string_from((str_t) new_node->content));
+            indi_dict_put(result, "$", indi_string_from((str_t) new_node->content));
 
             break;
         }
@@ -39,7 +43,7 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
         /**/
         /**/    /**/    xmlChar *attribute_val = xmlNodeListGetString(curr_node->doc, attribute->children, 1);
         /**/    /**/
-        /**/    /**/    /**/    indi_dict_put(dict, (str_t) attribute_name, indi_string_from((str_t) attribute_val));
+        /**/    /**/    /**/    indi_dict_put(result, (str_t) attribute_name, indi_string_from((str_t) attribute_val));
         /**/    /**/
         /**/    /**/    xmlFree(attribute_val);
         /**/
@@ -60,29 +64,23 @@ static indi_dict_t *xml_to_json(indi_dict_t *dict, xmlNode *curr_node) // NOLINT
             {
                 if(list == NULL)
                 {
-                    list = indi_list_new();
-
-                    indi_dict_put(dict, "children", list);
+                    indi_dict_put(result, "children", list = indi_list_new());
                 }
 
-                indi_list_push(list, xml_to_json(indi_dict_new(), new_node));
+                indi_list_push(list, xml_to_json(new_node));
             }
         }
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return dict;
+    return result;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_xml_to_json(STR_t xml, bool validate)
+indi_object_t *indi_xml_to_object(indi_xmldoc_t *doc, bool validate)
 {
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    xmlDoc *doc = xmlReadMemory(xml, strlen(xml), "message.xml", "iso-8859-1", 0);
-
     if(doc == NULL)
     {
         return NULL;
@@ -90,30 +88,14 @@ str_t indi_xml_to_json(STR_t xml, bool validate)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(validate && indi_validation_check(doc) == false)
+    if(validate == false || indi_validation_check(doc) == true)
     {
-        xmlFreeDoc(doc);
-
-        return NULL;
+        return (indi_object_t *) xml_to_json(xmlDocGetRootElement(doc));
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_dict_t *dict = xml_to_json(indi_dict_new(), xmlDocGetRootElement(doc));
-
-    str_t result = indi_dict_to_string(dict);
-
-    indi_dict_free(dict);
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    xmlFreeDoc(doc);
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    return result;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
+    return NULL;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

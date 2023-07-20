@@ -6,7 +6,7 @@
 
 typedef struct indi_list_node_s
 {
-    struct indi_object_s *val;
+    indi_object_t *val;
 
     struct indi_list_node_s *next;
 
@@ -149,7 +149,7 @@ indi_object_t *indi_list_get(indi_list_t *obj, int idx)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_list_t *indi_list_push(struct indi_list_s *obj, buff_t val)
+indi_list_t *indi_list_push(indi_list_t *obj, buff_t val)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
