@@ -59,7 +59,7 @@ typedef enum
 
 typedef struct
 {
-    uint32_t magic;
+    uint64_t magic;
 
     indi_type_t type;
 

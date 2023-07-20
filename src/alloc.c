@@ -16,7 +16,7 @@ typedef struct
 {
     size_t size;
 
-    uint32_t magic;
+    uint64_t magic;
 
 } block_t;
 
@@ -68,7 +68,7 @@ size_t indi_free(buff_t buff)
 
     block_t *block = (block_t *) (((str_t) buff) - sizeof(block_t));
 
-    if(block->magic != 0x75757575)
+    if(block->magic != 0x7575757575757575)
     {
         fprintf(stderr, "Memory corruption!\n");
         fflush(stderr);
@@ -113,7 +113,7 @@ buff_t indi_alloc(size_t size)
     used_mem += size;
 
     block->size = size;
-    block->magic = 0x75757575;
+    block->magic = 0x7575757575757575;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -138,7 +138,7 @@ buff_t indi_realloc(buff_t buff, size_t size)
 
     block_t *old_block = (block_t *) (((str_t) buff) - sizeof(block_t));
 
-    if(old_block->magic != 0x75757575)
+    if(old_block->magic != 0x7575757575757575)
     {
         fprintf(stderr, "Memory corruption!\n");
         fflush(stderr);
@@ -165,7 +165,7 @@ buff_t indi_realloc(buff_t buff, size_t size)
     used_mem += size;
 
     new_block->size = size;
-    new_block->magic = 0x75757575;
+    new_block->magic = 0x7575757575757575;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -233,9 +233,9 @@ void indi_object_free(indi_object_t *obj)
         return;
     }
 
-    if(obj->magic != 0x65656565)
+    if(obj->magic != 0x6565656565656565)
     {
-        fprintf(stderr, "Invalid base!\n");
+        fprintf(stderr, "Invalid object!\n");
         fflush(stderr);
         exit(1);
     }
@@ -282,9 +282,9 @@ str_t indi_object_to_string(const indi_object_t *obj)
         return NULL;
     }
 
-    if(obj->magic != 0x65656565)
+    if(obj->magic != 0x6565656565656565)
     {
-        fprintf(stderr, "Invalid base!\n");
+        fprintf(stderr, "Invalid object!\n");
         fflush(stderr);
         exit(1);
     }
@@ -325,9 +325,9 @@ str_t indi_object_to_cstring(const indi_object_t *obj)
         return NULL;
     }
 
-    if(obj->magic != 0x65656565)
+    if(obj->magic != 0x6565656565656565)
     {
-        fprintf(stderr, "Invalid base!\n");
+        fprintf(stderr, "Invalid object!\n");
         fflush(stderr);
         exit(1);
     }
