@@ -15,19 +15,19 @@ indi_xmldoc_t *indi_xml_parse(STR_t text)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_xmldoc_free(indi_xmldoc_t *doc)
+void indi_xmldoc_free(indi_xmldoc_t *xmldoc)
 {
-    if(doc != NULL)
+    if(xmldoc != NULL)
     {
-        xmlFreeDoc(doc);
+        xmlFreeDoc(xmldoc);
     }
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_xml_to_string(const indi_xmldoc_t *doc)
+str_t indi_xml_to_string(const indi_xmldoc_t *xmldoc)
 {
-    if(doc == NULL)
+    if(xmldoc == NULL)
     {
         return NULL;
     }
@@ -38,7 +38,7 @@ str_t indi_xml_to_string(const indi_xmldoc_t *doc)
 
     str_t result;
 
-    xmlDocDumpMemoryEnc((xmlDoc *) doc, (xmlChar **) &result, &length, "iso-8859-1");
+    xmlDocDumpMemoryEnc((xmlDoc *) xmldoc, (xmlChar **) &result, &length, "iso-8859-1");
 
     memmove(result, result + 44, length - 44 + 1);
 
