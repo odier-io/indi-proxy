@@ -100,7 +100,7 @@ void indi_xmldoc_free(
 );
 
 str_t indi_xml_to_string(
-    const indi_xmldoc_t *xmldoc
+    const indi_xmldoc_t *doc
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -112,7 +112,7 @@ bool indi_validation_init();
 bool indi_validation_free();
 
 bool indi_validation_check(
-    indi_xmldoc_t *xmldoc
+    indi_xmldoc_t *doc
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
