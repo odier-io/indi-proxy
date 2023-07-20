@@ -10,7 +10,7 @@
 
 indi_xmldoc_t *indi_xml_parse(STR_t text)
 {
-    return xmlReadMemory(text, strlen(text), "message.xml", "iso-8859-1", 0);
+    return (text != NULL ) ? xmlReadMemory(text, strlen(text), "message.xml", "iso-8859-1", 0) : NULL;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
