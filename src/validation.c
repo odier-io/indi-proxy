@@ -14,8 +14,29 @@ static xmlSchema *INDI_SCHEMA = NULL;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_validation_init()
+bool indi_validation_finalize()
 {
+    if(INDI_SCHEMA != NULL)
+    {
+        xmlSchemaFree(INDI_SCHEMA);
+
+        INDI_SCHEMA = NULL;
+    }
+
+    return true;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+bool indi_validation_initialize()
+{
+    if(INDI_SCHEMA != NULL)
+    {
+        return true;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     xmlSchemaParserCtxt *context = xmlSchemaNewMemParserCtxt(indi_proxy_xsd_buff, INDI_PROXY_XSD_SIZE);
 
     if(context == NULL)
@@ -40,27 +61,24 @@ bool indi_validation_init()
 
     xmlSchemaFreeParserCtxt(context);
 
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     return INDI_SCHEMA != NULL;
-}
 
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-bool indi_validation_free()
-{
-    if(INDI_SCHEMA != NULL)
-    {
-        xmlSchemaFree(INDI_SCHEMA);
-
-        return true;
-    }
-
-    return false;
+    /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 bool indi_validation_check(struct _xmlDoc *doc)
 {
+    if(INDI_SCHEMA == NULL)
+    {
+        return false;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     xmlSchemaValidCtxt *context = xmlSchemaNewValidCtxt(INDI_SCHEMA);
 
     if(context == NULL)
@@ -79,13 +97,17 @@ bool indi_validation_check(struct _xmlDoc *doc)
     /**/
     /**/    /*--------------------------------------------------------------------------------------------------------*/
     /**/
-    /**/    int result = xmlSchemaValidateDoc(context, (xmlDoc *) doc) == 0;
+    /**/    int result = xmlSchemaValidateDoc(context, (xmlDoc *) doc);
     /**/
     /**/    /*--------------------------------------------------------------------------------------------------------*/
 
     xmlSchemaFreeValidCtxt(context);
 
-    return result;
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    return result == XML_SCHEMAS_ERR_OK;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

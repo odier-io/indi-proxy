@@ -19,7 +19,7 @@ int main()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(indi_validation_init() == false)
+    if(indi_validation_initialize() == false)
     {
         printf("Error initializing validation\n");
 
@@ -56,7 +56,7 @@ int main()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(indi_validation_free() == false)
+    if(indi_validation_finalize() == false)
     {
         printf("Error finalizing validation\n");
 
