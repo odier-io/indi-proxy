@@ -8,7 +8,7 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static indi_dict_t *xml_to_json(xmlNode *curr_node) // NOLINT(misc-no-recursion)
+static indi_object_t *transform(xmlNode *curr_node) // NOLINT(misc-no-recursion)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -67,14 +67,14 @@ static indi_dict_t *xml_to_json(xmlNode *curr_node) // NOLINT(misc-no-recursion)
                     indi_dict_put(result, "children", list = indi_list_new());
                 }
 
-                indi_list_push(list, xml_to_json(new_node));
+                indi_list_push(list, transform(new_node));
             }
         }
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return result;
+    return (indi_object_t *) result;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -99,7 +99,7 @@ indi_object_t *indi_xmldoc_to_object(indi_xmldoc_t *doc, bool validate)
 
     if(validate == false || indi_validation_check(doc) == true)
     {
-        return (indi_object_t *) xml_to_json(root);
+        return transform(root);
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/

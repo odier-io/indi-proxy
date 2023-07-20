@@ -12,23 +12,24 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-struct indi_block_s
+typedef struct
 {
     size_t size;
 
     uint32_t magic;
-};
+
+} block_t;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static size_t mem_used = 0;
+static size_t used_mem = 0;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 void indi_memory_initialize()
 {
-    mem_used = 0;
+    used_mem = 0;
 
     xmlMemSetup(
         (buff_t) indi_free,
@@ -48,7 +49,7 @@ void indi_memory_finalize()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(mem_used > 0) fprintf(stderr, "Memory leak: %ld bytes!\n", mem_used);
+    if(used_mem > 0) fprintf(stderr, "Memory leak: %ld bytes!\n", used_mem);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
@@ -65,7 +66,7 @@ size_t indi_free(buff_t buff)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    struct indi_block_s *block = (struct indi_block_s *) (((str_t) buff) - sizeof(struct indi_block_s));
+    block_t *block = (block_t *) (((str_t) buff) - sizeof(block_t));
 
     if(block->magic != 0x75757575)
     {
@@ -78,7 +79,7 @@ size_t indi_free(buff_t buff)
 
     size_t result = block->size;
 
-    mem_used -= result;
+    used_mem -= result;
 
     free(block);
 
@@ -98,7 +99,7 @@ buff_t indi_alloc(size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    struct indi_block_s *block = malloc(sizeof(struct indi_block_s) + size);
+    block_t *block = malloc(sizeof(block_t) + size);
 
     if(block == NULL)
     {
@@ -109,14 +110,14 @@ buff_t indi_alloc(size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    mem_used += size;
+    used_mem += size;
 
     block->size = size;
     block->magic = 0x75757575;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return (struct indi_block_s *) (((str_t) block) + sizeof(struct indi_block_s));
+    return (block_t *) (((str_t) block) + sizeof(block_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
@@ -135,7 +136,7 @@ buff_t indi_realloc(buff_t buff, size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    struct indi_block_s *old_block = (struct indi_block_s *) (((str_t) buff) - sizeof(struct indi_block_s));
+    block_t *old_block = (block_t *) (((str_t) buff) - sizeof(block_t));
 
     if(old_block->magic != 0x75757575)
     {
@@ -146,11 +147,11 @@ buff_t indi_realloc(buff_t buff, size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    mem_used -= old_block->size;
+    used_mem -= old_block->size;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    struct indi_block_s *new_block = realloc(old_block, sizeof(struct indi_block_s) + size);
+    block_t *new_block = realloc(old_block, sizeof(block_t) + size);
 
     if(new_block == NULL)
     {
@@ -161,14 +162,14 @@ buff_t indi_realloc(buff_t buff, size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    mem_used += size;
+    used_mem += size;
 
     new_block->size = size;
     new_block->magic = 0x75757575;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    return (struct indi_block_s *) (((str_t) new_block) + sizeof(struct indi_block_s));
+    return (block_t *) (((str_t) new_block) + sizeof(block_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }

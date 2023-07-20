@@ -8,7 +8,7 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static xmlNode *json_to_xml(indi_object_t *dict) // NOLINT(misc-no-recursion)
+static xmlNode *transform(indi_object_t *dict) // NOLINT(misc-no-recursion)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -65,7 +65,7 @@ static xmlNode *json_to_xml(indi_object_t *dict) // NOLINT(misc-no-recursion)
 
             for(indi_list_iter_t iter2 = INDI_LIST_ITER(obj1); indi_list_iterate(&iter2, &idx, &obj2);)
             {
-                xmlAddChild(node, json_to_xml(obj2));
+                xmlAddChild(node, transform(obj2));
             }
         }
 
@@ -88,7 +88,7 @@ indi_xmldoc_t *indi_object_to_xmldoc(indi_object_t *obj, bool validate)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    xmlNode *root = json_to_xml(obj);
+    xmlNode *root = transform(obj);
 
     if(root == NULL)
     {
