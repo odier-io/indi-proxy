@@ -12,7 +12,7 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 #define buff_t /* */ void *
-/////// BUFF_t const void *
+#define BUFF_t const void *
 
 #define str_t /* */ char *
 #define STR_t const char *
@@ -133,24 +133,45 @@ indi_xmldoc_t *indi_object_to_xmldoc(
 /* PROXY                                                                                                              */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-typedef void (* indi_emit_t)(str_t message);
+typedef void (* indi_emit_func_t)(str_t message);
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 typedef struct
 {
-    indi_emit_t emit;
+    indi_emit_func_t emit_func;
+
+    size_t size;
+    str_t buff;
+
+    size_t read_size;
+    size_t write_size;
+
+    size_t read_idx;
+    size_t write_idx;
+
+    size_t stag_idx;
+
+    STR_t etag;
 
 } indi_proxy_t;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 bool indi_proxy_initialize(
-    indi_proxy_t *proxy
+    indi_proxy_t *proxy,
+    indi_emit_func_t emit_func,
+    size_t size
 );
 
 bool indi_proxy_finalize(
     indi_proxy_t *proxy
+);
+
+void indi_proxy_consume(
+    indi_proxy_t *proxy,
+    size_t size,
+    BUFF_t buff
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
