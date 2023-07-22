@@ -133,14 +133,16 @@ indi_xmldoc_t *indi_object_to_xmldoc(
 /* PROXY                                                                                                              */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-typedef void (* indi_emit_func_t)(str_t message);
+struct indi_proxy_s;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-typedef struct
-{
-    indi_emit_func_t emit_func;
+typedef void (* indi_emit_func_t)(struct indi_proxy_s *proxy, size_t size, str_t buff);
 
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct indi_proxy_s
+{
     size_t size;
     str_t buff;
 
@@ -149,22 +151,24 @@ typedef struct
 
     size_t read_idx;
     size_t write_idx;
-
     size_t stag_idx;
 
     STR_t etag;
+    buff_t user;
+
+    indi_emit_func_t emit_func;
 
 } indi_proxy_t;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-bool indi_proxy_initialize(
+void indi_proxy_initialize(
     indi_proxy_t *proxy,
-    indi_emit_func_t emit_func,
-    size_t size
+    size_t size,
+    indi_emit_func_t emit_func
 );
 
-bool indi_proxy_finalize(
+void indi_proxy_finalize(
     indi_proxy_t *proxy
 );
 

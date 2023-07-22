@@ -17,7 +17,7 @@ int main()
 
     indi_proxy_t proxy;
 
-    indi_proxy_initialize(&proxy, NULL, 75);
+    indi_proxy_initialize(&proxy, 75, NULL);
 
     for(int i = 0; i < 50; i++)
     {

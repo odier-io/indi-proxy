@@ -1,4 +1,6 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
+#define PY_SSIZE_T_CLEAN
+/*--------------------------------------------------------------------------------------------------------------------*/
 
 #include <Python.h>
 
@@ -214,13 +216,82 @@ static PyObject *py_indi_object_to_xmldoc(PyObject *self, PyObject *args)
 /* PROXY                                                                                                              */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+static void __emit(indi_proxy_t *proxy, size_t size, str_t buff)
+{
+    PyObject *py_string = PyUnicode_FromStringAndSize(buff, size);
+
+    PyObject *py_tuple = PyTuple_Pack(1, py_string);
+
+    Py_XDECREF(PyObject_CallObject(
+        (PyObject *) proxy->user,
+        py_tuple
+    ));
+
+    Py_DECREF(py_tuple);
+    Py_DECREF(py_string);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyObject *py_indi_proxy_initialize(PyObject *self, PyObject *args)
+{
+    size_t size;
+    PyObject *py_object;
+
+    if(!PyArg_ParseTuple(args, "nO:", &size, &py_object))
+    {
+        return NULL;
+    }
+
+    if(!PyCallable_Check(py_object))
+    {
+        PyErr_SetString(PyExc_TypeError, "Parameter must be callable");
+
+        return NULL;
+    }
+
+    indi_proxy_t *proxy = (indi_proxy_t *) indi_alloc(sizeof(indi_proxy_t));
+
+    indi_proxy_initialize(proxy, size, __emit);
+
+    proxy->user = (buff_t) py_object;
+
+    Py_XINCREF(py_object);
+
+    return PyLong_FromVoidPtr(proxy);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyObject *py_indi_proxy_finalize(PyObject *self, PyObject *args)
+{
+    PyObject *py_proxy;
+
+    if(!PyArg_ParseTuple(args, "O", &py_proxy))
+    {
+        return NULL;
+    }
+
+    indi_proxy_t *proxy = (indi_proxy_t *) PyLong_AsVoidPtr(py_proxy);
+
+    Py_XDECREF((PyObject *) proxy->user);
+
+    indi_proxy_finalize(proxy);
+
+    indi_free(proxy);
+
+    Py_RETURN_NONE;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 static PyObject *py_indi_proxy_consume(PyObject *self, PyObject *args)
 {
     PyObject *py_proxy;
     STR_t buff;
-    Py_ssize_t size;
+    size_t size;
 
-    if(!PyArg_ParseTuple(args, "Os#", &py_proxy, &buff, &size))
+    if(!PyArg_ParseTuple(args, "Oz#", &py_proxy, &buff, &size))
     {
         return NULL;
     }
@@ -232,6 +303,8 @@ static PyObject *py_indi_proxy_consume(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+/*--------------------------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 static PyMethodDef indi_proxy_methods[] = {
@@ -251,8 +324,8 @@ static PyMethodDef indi_proxy_methods[] = {
     {"xmldoc_to_object", py_indi_xmldoc_to_object, METH_VARARGS, ""},
     {"object_to_xmldoc", py_indi_object_to_xmldoc, METH_VARARGS, ""},
     /**/
-//    {"proxy_consume", py_indi_proxy_initialize, METH_VARARGS, ""},
-//    {"proxy_consume", py_indi_proxy_finalize, METH_VARARGS, ""},
+    {"proxy_initialize", py_indi_proxy_initialize, METH_VARARGS, ""},
+    {"proxy_finalize", py_indi_proxy_finalize, METH_VARARGS, ""},
     {"proxy_consume", py_indi_proxy_consume, METH_VARARGS, ""},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
@@ -271,4 +344,6 @@ PyMODINIT_FUNC PyInit_indi_proxy(void)
     return PyModule_Create(&indi_proxy_module);
 }
 
+/*--------------------------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
