@@ -78,13 +78,13 @@ set_target_properties(indi-proxy-shared PROPERTIES
 
 ########################################################################################################################
 
-add_executable(test1 test1.c)
+add_executable(test1 test/test1.c)
 
 target_link_libraries(test1 ${LIBXML2_LIBRARIES} indi-proxy-static)
 
 ########################################################################################################################
 
-add_executable(test2 test2.c)
+add_executable(test2 test/test2.c)
 
 target_link_libraries(test2 ${LIBXML2_LIBRARIES} indi-proxy-static)
 

@@ -8,8 +8,6 @@ from setuptools import setup, Extension
 indi_proxy_module = Extension(
     'indi_proxy',
     sources = [
-        'module.c',
-        #
         'src/structs/indi_boolean.c',
         'src/structs/indi_dict.c',
         'src/structs/indi_list.c',
@@ -24,6 +22,8 @@ indi_proxy_module = Extension(
         'src/transform_xml_to_json.c',
         'src/validation.c',
         'src/xml.c',
+        #
+        'src/module.c',
     ]
 )
 
