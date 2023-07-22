@@ -2,8 +2,7 @@
 node_modules
 package-lock.json
 
+/dist/
 /build/
 /cmake-build-*/
-
-*.egg
-*.egg-info
+/indi_proxy.egg-info/
