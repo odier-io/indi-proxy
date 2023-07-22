@@ -40,7 +40,7 @@ int main()
 
     indi_object_t *obj2 = indi_json_parse(json2);
     indi_xmldoc_t *doc2 = indi_object_to_xmldoc(obj2, false);
-    str_t xml = indi_xml_to_string(doc2);
+    str_t xml = indi_xmldoc_to_string(doc2);
     indi_xmldoc_free(doc2);
     indi_object_free(obj2);
 

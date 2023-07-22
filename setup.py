@@ -1,7 +1,35 @@
 #!/usr/bin/env python3
 ########################################################################################################################
 
-def main():
+from setuptools import setup, Extension
+
+########################################################################################################################
+
+indi_proxy_module = Extension(
+    'indi_proxy',
+    sources = [
+        'module.c',
+        #
+        'src/structs/indi_boolean.c',
+        'src/structs/indi_dict.c',
+        'src/structs/indi_list.c',
+        'src/structs/indi_null.c',
+        'src/structs/indi_number.c',
+        'src/structs/indi_string.c',
+        #
+        'src/alloc.c',
+        'src/json.c',
+        'src/proxy.c',
+        'src/transform_json_to_xml.c',
+        'src/transform_xml_to_json.c',
+        'src/validation.c',
+        'src/xml.c',
+    ]
+)
+
+########################################################################################################################
+
+def prepare():
 
     ####################################################################################################################
 
@@ -28,10 +56,18 @@ def main():
 
         f.write(f'char indi_proxy_xsd_buff[] = {{{data_out}}};\n')
 
-    ####################################################################################################################
+########################################################################################################################
 
 if __name__ == '__main__':
 
-    main()
+    prepare()
+
+    setup(
+        name = 'indi_proxy',
+        version = '1.0.0',
+        description = 'Blabla',
+        author = 'Jérôme ODIER',
+        ext_modules = [indi_proxy_module]
+    )
 
 ########################################################################################################################

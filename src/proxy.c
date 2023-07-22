@@ -288,7 +288,7 @@ static STR_t ETAG_NAMES[] = {
 
 static STR_t ring_find_xml_tags(indi_proxy_t *proxy)
 {
-    for(int i = 0; i < sizeof(STAG_NAMES) / sizeof(STAG_NAMES[0]); i++)
+    for(size_t i = 0; i < sizeof(STAG_NAMES) / sizeof(STAG_NAMES[0]); i++)
     {
         if(ring_find_string(proxy, STAG_NAMES[i]))
         {
@@ -301,7 +301,7 @@ static STR_t ring_find_xml_tags(indi_proxy_t *proxy)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_proxy_consume(indi_proxy_t *proxy, size_t size, BUFF_t buff)
+void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 

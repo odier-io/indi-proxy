@@ -25,7 +25,7 @@ void indi_xmldoc_free(indi_xmldoc_t *doc)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-str_t indi_xml_to_string(const indi_xmldoc_t *doc)
+str_t indi_xmldoc_to_string(const indi_xmldoc_t *doc)
 {
     if(doc == NULL)
     {

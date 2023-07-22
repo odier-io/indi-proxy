@@ -99,7 +99,7 @@ void indi_xmldoc_free(
     /*-*/ indi_xmldoc_t *doc
 );
 
-str_t indi_xml_to_string(
+str_t indi_xmldoc_to_string(
     const indi_xmldoc_t *doc
 );
 
@@ -171,7 +171,7 @@ bool indi_proxy_finalize(
 void indi_proxy_consume(
     indi_proxy_t *proxy,
     size_t size,
-    BUFF_t buff
+    STR_t buff
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
