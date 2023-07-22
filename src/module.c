@@ -68,7 +68,7 @@ static PyObject *py_indi_json_parse(PyObject *self, PyObject *args)
 {
     STR_t json;
 
-    if(!PyArg_ParseTuple(args, "s", &json))
+    if(!PyArg_ParseTuple(args, "y", &json))
     {
         return NULL;
     }
@@ -110,7 +110,7 @@ static PyObject *py_indi_object_to_string(PyObject *self, PyObject *args)
     indi_object_t *object = (indi_object_t *) PyLong_AsVoidPtr(py_object);
 
     str_t result = indi_object_to_string(object);
-    PyObject *py_result = PyUnicode_FromString(result);
+    PyObject *py_result = PyBytes_FromString(result);
     indi_free(result);
 
     return py_result;
@@ -124,7 +124,7 @@ static PyObject *py_indi_xml_parse(PyObject *self, PyObject *args)
 {
     STR_t xml;
 
-    if(!PyArg_ParseTuple(args, "s", &xml))
+    if(!PyArg_ParseTuple(args, "y", &xml))
     {
         return NULL;
     }
@@ -166,7 +166,7 @@ static PyObject *py_indi_xmldoc_to_string(PyObject *self, PyObject *args)
     indi_xmldoc_t *xmldoc = (indi_xmldoc_t *) PyLong_AsVoidPtr(py_object);
 
     buff_t result = indi_xmldoc_to_string(xmldoc);
-    PyObject *py_result = PyUnicode_FromString(result);
+    PyObject *py_result = PyBytes_FromString(result);
     indi_free(result);
 
     return py_result;
@@ -198,16 +198,16 @@ static PyObject *py_indi_xmldoc_to_object(PyObject *self, PyObject *args)
 static PyObject *py_indi_object_to_xmldoc(PyObject *self, PyObject *args)
 {
     PyObject *py_object;
-    int json_flag;
+    int validate;
 
-    if(!PyArg_ParseTuple(args, "Oi", &py_object, &json_flag))
+    if(!PyArg_ParseTuple(args, "Oi", &py_object, &validate))
     {
         return NULL;
     }
 
     indi_object_t *object = (indi_object_t *) PyLong_AsVoidPtr(py_object);
 
-    indi_xmldoc_t *result = indi_object_to_xmldoc(object, json_flag);
+    indi_xmldoc_t *result = indi_object_to_xmldoc(object, validate);
 
     return PyLong_FromVoidPtr(result);
 }
@@ -216,9 +216,9 @@ static PyObject *py_indi_object_to_xmldoc(PyObject *self, PyObject *args)
 /* PROXY                                                                                                              */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static void __emit(indi_proxy_t *proxy, size_t size, str_t buff)
+static void py_indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 {
-    PyObject *py_string = PyUnicode_FromStringAndSize(buff, size);
+    PyObject *py_string = PyBytes_FromStringAndSize(buff, size);
 
     PyObject *py_tuple = PyTuple_Pack(1, py_string);
 
@@ -252,7 +252,7 @@ static PyObject *py_indi_proxy_initialize(PyObject *self, PyObject *args)
 
     indi_proxy_t *proxy = (indi_proxy_t *) indi_alloc(sizeof(indi_proxy_t));
 
-    indi_proxy_initialize(proxy, size, __emit);
+    indi_proxy_initialize(proxy, size, py_indi_proxy_emit);
 
     proxy->user = (buff_t) py_object;
 
@@ -291,7 +291,7 @@ static PyObject *py_indi_proxy_consume(PyObject *self, PyObject *args)
     STR_t buff;
     size_t size;
 
-    if(!PyArg_ParseTuple(args, "Oz#", &py_proxy, &buff, &size))
+    if(!PyArg_ParseTuple(args, "Oy#", &py_proxy, &buff, &size))
     {
         return NULL;
     }

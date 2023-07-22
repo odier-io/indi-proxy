@@ -17,11 +17,11 @@ if __name__ == '__main__':
 
     proxy = indi_proxy.proxy_initialize(1024, emit)
 
-    indi_proxy.proxy_consume(proxy, '....................................................<defSwitchVector>foo</def')
-    indi_proxy.proxy_consume(proxy, 'SwitchVector>........')
+    indi_proxy.proxy_consume(proxy, '....................................................<defSwitchVector>foo</def'.encode('utf-8'))
+    indi_proxy.proxy_consume(proxy, 'SwitchVector>........'.encode('utf-8'))
 
-    indi_proxy.proxy_consume(proxy, '...........................................<defNumberVector>foo')
-    indi_proxy.proxy_consume(proxy, '</defNumberVector>................................')
+    indi_proxy.proxy_consume(proxy, '...........................................<defNumberVector>foo'.encode('utf-8'))
+    indi_proxy.proxy_consume(proxy, '</defNumberVector>................................'.encode('utf-8'))
 
     indi_proxy.proxy_finalize(proxy)
 
