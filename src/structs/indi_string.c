@@ -18,7 +18,7 @@ indi_string_t *indi_string_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_string_t *obj = indi_alloc(sizeof(indi_string_t));
+    indi_string_t *obj = indi_memory_alloc(sizeof(indi_string_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -49,12 +49,12 @@ void indi_string_free(indi_string_t *obj)
 
         /**/
 
-        indi_free(temp);
+        indi_memory_free(temp);
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_free(obj);
+    indi_memory_free(obj);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
@@ -69,13 +69,13 @@ void indi_string_append(indi_string_t *obj, STR_t data)
 
     if(data == NULL)
     {
-        node = indi_alloc(sizeof(node_t) + 0x00000000000006 + 1);
+        node = indi_memory_alloc(sizeof(node_t) + 0x00000000000006 + 1);
 
         strcpy((str_t) (node + 1), "(null)");
     }
     else
     {
-        node = indi_alloc(sizeof(node_t) + strlen(data) + 1);
+        node = indi_memory_alloc(sizeof(node_t) + strlen(data) + 1);
 
         strcpy((str_t) (node + 1), data);
     }
@@ -126,7 +126,7 @@ static str_t to_string(indi_string_t *obj, bool json_string)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    str_t result = indi_alloc(length + 3);
+    str_t result = indi_memory_alloc(length + 3);
 
     str_t p = result;
 

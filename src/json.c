@@ -61,6 +61,25 @@ typedef struct json_parser_s
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+#define TRIM(s, e) \
+    ({                                                                      \
+        size_t result = (size_t) (e) - (size_t) (s);                        \
+                                                                            \
+        while((isspace(*((s) + 0)) || *((s) + 0) == '"') && result > 0) {   \
+            (s)++;                                                          \
+            result--;                                                       \
+        }                                                                   \
+                                                                            \
+        while((isspace(*((e) - 1)) || *((e) - 1) == '"') && result > 0) {   \
+            (e)--;                                                          \
+            result--;                                                       \
+        }                                                                   \
+                                                                            \
+        result;                                                             \
+    })
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 static void tokenizer_next(json_parser_t *parser)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
@@ -69,8 +88,8 @@ static void tokenizer_next(json_parser_t *parser)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    const char *start = parser->pos;
-    const char *end = parser->pos;
+    STR_t start = parser->pos;
+    STR_t end = parser->pos;
 
     json_token_type_t type;
 
@@ -163,17 +182,26 @@ static void tokenizer_next(json_parser_t *parser)
 
     /**/ if(type == JSON_TOKEN_NUMBER)
     {
-        size_t length = (size_t) end - (size_t) start - 0;
+        STR_t s = start;
+        STR_t e =  end ;
 
-        parser->curr_token.val = strncpy(indi_alloc(length + 1), start + 0, length);
+        size_t length = TRIM(s, e);
+
+        parser->curr_token.val = strncpy(indi_memory_alloc(length + 1), s + 0, length);
 
         parser->curr_token.val[length] = '\0';
     }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     else if(type == JSON_TOKEN_STRING)
     {
-        size_t length = (size_t) end - (size_t) start - 2;
+        STR_t s = start;
+        STR_t e =  end ;
 
-        parser->curr_token.val = strncpy(indi_alloc(length + 1), start + 1, length);
+        size_t length = TRIM(s, e);
+
+        parser->curr_token.val = strncpy(indi_memory_alloc(length + 1), s, length);
 
         parser->curr_token.val[length] = '\0';
     }
@@ -249,7 +277,7 @@ static indi_number_t *json_parse_number(json_parser_t *parser)
 
     indi_number_t *result = indi_number_from(atof(val));
 
-    indi_free(val);
+    indi_memory_free(val);
 
     NEXT();
 
@@ -269,7 +297,7 @@ static indi_string_t *json_parse_string(json_parser_t *parser)
 
     indi_string_t *result = indi_string_from(/**/(val));
 
-    indi_free(val);
+    indi_memory_free(val);
 
     NEXT();
 
@@ -310,7 +338,7 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 
         if(CHECK(JSON_TOKEN_COLON) == false)
         {
-            indi_free(key);
+            indi_memory_free(key);
 
             goto _err;
         }
@@ -341,14 +369,14 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
             indi_dict_put(result, key, json_parse_list(parser));
         }
         else {
-            indi_free(key);
+            indi_memory_free(key);
 
             goto _err;
         }
 
         /*------------------------------------------------------------------------------------------------------------*/
 
-        indi_free(key);
+        indi_memory_free(key);
 
         /*------------------------------------------------------------------------------------------------------------*/
 
@@ -388,7 +416,7 @@ static indi_dict_t *json_parse_dict(json_parser_t *parser) // NOLINT(misc-no-rec
 _err:
     if(CHECK(JSON_TOKEN_NUMBER) || CHECK(JSON_TOKEN_STRING))
     {
-        indi_free(PEEK().val);
+        indi_memory_free(PEEK().val);
     }
 
     indi_dict_free(result);
@@ -480,7 +508,7 @@ static indi_list_t *json_parse_list(json_parser_t *parser) // NOLINT(misc-no-rec
 _err:
     if(CHECK(JSON_TOKEN_NUMBER) || CHECK(JSON_TOKEN_STRING))
     {
-        indi_free(PEEK().val);
+        indi_memory_free(PEEK().val);
     }
 
     indi_list_free(result);

@@ -1,5 +1,6 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+#include <ctype.h>
 #include <string.h>
 
 #include <libxml/tree.h>
@@ -22,6 +23,32 @@ static indi_object_t *transform(xmlNode *curr_node) // NOLINT(misc-no-recursion)
 
     for(xmlNode *new_node = curr_node->children; new_node != NULL; new_node = new_node->next)
     {
+        if(new_node->type == XML_TEXT_NODE)
+        {
+            xmlChar *content_s = new_node->content - 0x0000;
+            size_t length = strlen((str_t) content_s);
+            xmlChar *content_e = new_node->content + length;
+
+            while((isspace(*(content_s + 0)) || *(content_s + 0) == '"') && length > 0) {
+                content_s++;
+                length--;
+            }
+
+            while((isspace(*(content_e - 1)) || *(content_e - 1) == '"') && length > 0) {
+                content_e--;
+                length--;
+            }
+
+            if(length > 0)
+            {
+                *content_e = '\0';
+
+                indi_dict_put(result, "$", indi_string_from((str_t) content_s));
+            }
+
+            break;
+        }
+
         if(new_node->type == XML_TEXT_NODE && strlen((str_t) new_node->content) > 0)
         {
             indi_dict_put(result, "$", indi_string_from((str_t) new_node->content));
@@ -47,7 +74,7 @@ static indi_object_t *transform(xmlNode *curr_node) // NOLINT(misc-no-recursion)
         /**/    /**/
         /**/    /**/    xmlFree(attribute_val);
         /**/
-        /**/    indi_free(attribute_name);
+        /**/    indi_memory_free(attribute_name);
 
         indi_string_free(obj);
     }

@@ -7,6 +7,14 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+#define STATE_OUTSIDE 100
+#define STATE_INSIDE1 200
+#define STATE_INSIDE2 300
+#define STATE_INSIDE3 400
+#define STATE_INSIDE4 500
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 static void fake_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 {
     printf("|%s|\n", buff);
@@ -18,26 +26,21 @@ void indi_proxy_initialize(indi_proxy_t *proxy, size_t size, indi_emit_func_t em
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->size = /*------*/(size + 0);
-    proxy->buff = indi_alloc(size + 1);
-
-    memset(proxy->buff, 0x00, size + 1);
+    proxy->residual_size = 0x000000000000000000000;
+    proxy->residual_buff = indi_memory_alloc(2048);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->read_size = 0;
-    proxy->write_size = 0;
+    proxy->size = /*-------------*/(size + 0);
+    proxy->buff = indi_memory_alloc(size + 1);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->read_idx = 0;
-    proxy->write_idx = 0;
-    proxy->stag_idx = 0;
+    proxy->state = STATE_OUTSIDE;
+    proxy->pos = 0x00000000000;
 
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    proxy->etag = NULL;
-    proxy->user = NULL;
+    proxy->etag_size = 0x00;
+    proxy->etag_buff = NULL;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -52,216 +55,14 @@ void indi_proxy_initialize(indi_proxy_t *proxy, size_t size, indi_emit_func_t em
 
 void indi_proxy_finalize(indi_proxy_t *proxy)
 {
-    indi_free(proxy->buff);
+    indi_memory_free(proxy->/**/buff/**/);
+
+    indi_memory_free(proxy->residual_buff);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static __inline__ size_t _min(size_t x, size_t y)
-{
-    return x < y ? x : y;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static size_t _ring_write(indi_proxy_t *proxy, size_t raw_size, STR_t raw_buff)
-{
-    const size_t ring_size = proxy->size;
-    /*-*/ str_t ring_buff = proxy->buff;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    /*-*/ size_t data_size;
-    const str_t data_buff;
-
-    if(raw_size > ring_size)
-    {
-        data_size = ring_size;
-        data_buff = raw_buff + (raw_size - ring_size);
-    }
-    else
-    {
-        data_size = raw_size;
-        data_buff = raw_buff + 0x00000000000000000000;
-    }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    const size_t write_idx = proxy->write_idx;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    const size_t size_right = _min(data_size, ring_size - write_idx);
-    const size_t size_left = _min(data_size - size_right, write_idx);
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    if(size_right > 0)
-    {
-        memcpy(ring_buff + write_idx, data_buff, size_right);
-
-        proxy->write_idx = write_idx + size_right;
-    }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    if(size_left > 0)
-    {
-        memcpy(ring_buff, data_buff + size_right, size_left);
-
-        proxy->write_idx = 0x0000000 + size_left;
-    }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    proxy->write_size += data_size;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    return data_size;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static bool ring_find_symbol(indi_proxy_t *proxy, const int symbol)
-{
-    size_t l = 0;
-
-    STR_t buffer_ptr;
-    STR_t buffer_end;
-
-    const size_t ring_size = proxy->size;
-    const str_t ring_buff = proxy->buff;
-
-    const size_t read_idx = proxy->read_idx;
-    const size_t write_idx = proxy->write_idx;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    const size_t size_right = write_idx > read_idx ? write_idx - read_idx : ring_size - read_idx;
-    const size_t size_left = write_idx < read_idx ? write_idx : 0;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    buffer_ptr = (STR_t) ring_buff + read_idx + 0x00000000;
-    buffer_end = (STR_t) ring_buff + read_idx + size_right;
-
-    for(; buffer_ptr != buffer_end; buffer_ptr++, l++)
-    {
-        if(*buffer_ptr == symbol)
-        {
-            proxy->read_size += l;
-
-            proxy->read_idx = (size_t) buffer_ptr - (size_t) ring_buff;
-
-            while(proxy->read_idx > ring_size) proxy->read_idx -= ring_size;
-
-            return true;
-        }
-    }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    buffer_ptr = (STR_t) ring_buff + 0x0000000;
-    buffer_end = (STR_t) ring_buff + size_left;
-
-    for(; buffer_ptr < buffer_end; buffer_ptr++, l++)
-    {
-        if(*buffer_ptr == symbol)
-        {
-            proxy->read_size += l;
-
-            proxy->read_idx = (size_t) buffer_ptr - (size_t) ring_buff;
-
-            while(proxy->read_idx > ring_size) proxy->read_idx -= ring_size;
-
-            return true;
-        }
-    }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    return false;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static int ring_find_string(indi_proxy_t *proxy, STR_t s)
-{
-    size_t l = 0;
-
-    STR_t buffer_ptr;
-    STR_t buffer_end;
-
-    const size_t length = strlen(s);
-
-    const size_t ring_size = proxy->size;
-    const str_t ring_buff = proxy->buff;
-
-    const size_t read_idx = proxy->read_idx;
-    const size_t write_idx = proxy->write_idx;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    const size_t size_right = write_idx > read_idx ? write_idx - read_idx : ring_size - read_idx;
-    const size_t size_left = write_idx < read_idx ? write_idx : 0;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    buffer_ptr = (STR_t) ring_buff + read_idx + 0x00000000;
-    buffer_end = (STR_t) ring_buff + read_idx + size_right;
-
-    for(; buffer_ptr != buffer_end && l < length; buffer_ptr++, l++)
-    {
-        if(*buffer_ptr != s[l])
-        {
-            break;
-        }
-    }
-
-    if(l == length)
-    {
-        proxy->read_size += length;
-
-        proxy->read_idx = (size_t) buffer_ptr - (size_t) ring_buff;
-
-        while(proxy->read_idx > ring_size) proxy->read_idx -= ring_size;
-
-        return true;
-    }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    buffer_ptr = (STR_t) ring_buff + 0x0000000;
-    buffer_end = (STR_t) ring_buff + size_left;
-
-    for(; buffer_ptr != buffer_end && l < length; buffer_ptr++, l++)
-    {
-        if(*buffer_ptr != s[l])
-        {
-            break;
-        }
-    }
-
-    if(l == length)
-    {
-        proxy->read_size += length;
-
-        proxy->read_idx = (size_t) buffer_ptr - (size_t) ring_buff;
-
-        while(proxy->read_idx > ring_size) proxy->read_idx -= ring_size;
-
-        return true;
-    }
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    return false;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static STR_t STAG_NAMES[] = {
+static STR_t S_TAGS[] = {
     "<defTextVector",
     "<defNumberVector",
     "<defSwitchVector",
@@ -269,7 +70,7 @@ static STR_t STAG_NAMES[] = {
     "<defBLOBVector",
 };
 
-static STR_t ETAG_NAMES[] = {
+static STR_t E_TAGS[] = {
     "</defTextVector>",
     "</defNumberVector>",
     "</defSwitchVector>",
@@ -279,80 +80,198 @@ static STR_t ETAG_NAMES[] = {
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static STR_t ring_find_xml_tags(indi_proxy_t *proxy)
-{
-    for(size_t i = 0; i < sizeof(STAG_NAMES) / sizeof(STAG_NAMES[0]); i++)
-    {
-        if(ring_find_string(proxy, STAG_NAMES[i]))
-        {
-            return ETAG_NAMES[i];
-        }
-    }
-
-    return NULL;
-}
+#define PREVENT_OVERFLOW(size) \
+                                                    \
+            if(proxy->pos + (size) > PROXY_SIZE)    \
+            {                                       \
+                fprintf(stderr, "Overflow!\n");     \
+                                                    \
+                proxy->state = STATE_OUTSIDE;       \
+                proxy->pos = 0x00000000000;         \
+                                                    \
+                return;                             \
+            }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 {
+    bool all_tested;
+
+    size_t input_pos = 0;
+
+    size_t INPUT_SIZE = size;
+    size_t PROXY_SIZE = proxy->size;
+
+    STR_t input_ptr = buff + 0x0000000;
+    str_t proxy_ptr = proxy->buff + proxy->pos;
+
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    _ring_write(proxy, size, buff);
+    if(proxy->residual_size > 0)
+    {
+        INPUT_SIZE += proxy->residual_size;
+        input_ptr = proxy->residual_buff;
+
+        memcpy(proxy->residual_buff + proxy->residual_size, buff, size + 1);
+
+        proxy->residual_size = 0;
+    }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
     for(;;)
     {
-        if(proxy->etag == NULL)
+        switch(proxy->state)
         {
             /*--------------------------------------------------------------------------------------------------------*/
 
-            if(ring_find_symbol(proxy, '<') == false) {
-                break;
-            }
+            _label_outside:
+            case STATE_OUTSIDE:
 
-            proxy->stag_idx = proxy->read_idx;
+                while(input_pos < INPUT_SIZE)
+                {
+                    if(*input_ptr != '<')
+                    {
+                        /* skip character */
 
-            if((proxy->etag = ring_find_xml_tags(proxy)) == NULL) {
-                break;
-            }
+                        input_ptr++;
+                        input_pos++;
+                    }
+                    else
+                    {
+                        proxy->state = STATE_INSIDE1;
+                        goto _label_inside1;
+                    }
+                }
 
-            /*--------------------------------------------------------------------------------------------------------*/
-        }
-        else
-        {
-            /*--------------------------------------------------------------------------------------------------------*/
-
-            if(ring_find_symbol(proxy, '<') == false) {
-                break;
-            }
-
-            /*------------------------------*/
-
-            if(ring_find_string(proxy, proxy->etag) == false) {
-                break;
-            }
+                return;
 
             /*--------------------------------------------------------------------------------------------------------*/
 
-            const size_t size_right = proxy->read_idx > proxy->stag_idx ? proxy->read_idx - proxy->stag_idx : proxy->size - proxy->stag_idx;
-            const size_t size_left = proxy->read_idx < proxy->stag_idx ? proxy->read_idx : 0;
+            _label_inside1:
+            case STATE_INSIDE1:
 
-            str_t xml = indi_alloc(size_right + size_left + 1);
+                all_tested = true;
 
-            memcpy(xml, proxy->buff + proxy->stag_idx, size_right);
-            memcpy(xml + size_right, proxy->buff, size_left);
+                for(size_t k = 0; k < 5; k++)
+                {
+                    size_t tag_size = strlen(S_TAGS[k]);
+                    BUFF_t tag_buff = /*--*/(S_TAGS[k]);
 
-            xml[size_right + size_left + 1] = '\0';
+                    if(input_pos + tag_size <= INPUT_SIZE)
+                    {
+                        if(memcmp(input_ptr, tag_buff, tag_size) == 0)
+                        {
+                            PREVENT_OVERFLOW(tag_size) memcpy(proxy_ptr, tag_buff, tag_size);
 
-            proxy->emit_func(proxy, size_right + size_left, xml);
+                            input_ptr += tag_size;
+                            input_pos += tag_size;
 
-            indi_free(xml);
+                            proxy_ptr += tag_size;
+                            proxy->pos += tag_size;
+
+                            proxy->etag_size = strlen(E_TAGS[k]);
+                            proxy->etag_buff = /*--*/(E_TAGS[k]);
+
+                            proxy->state = STATE_INSIDE2;
+                            goto _label_inside2;
+                        }
+                    }
+                    else
+                    {
+                        all_tested = false;
+                    }
+                }
+
+                if(all_tested)
+                {
+                    /* skip character */
+
+                    input_ptr++;
+                    input_pos++;
+
+                    proxy->state = STATE_OUTSIDE;
+                    goto _label_outside;
+                }
+
+                memmove(proxy->residual_buff, input_ptr, proxy->residual_size = INPUT_SIZE - input_pos);
+
+                return;
 
             /*--------------------------------------------------------------------------------------------------------*/
 
-            proxy->etag = NULL;
+            _label_inside2:
+            case STATE_INSIDE2:
+
+                while(input_pos < INPUT_SIZE)
+                {
+                    if(*input_ptr != '<')
+                    {
+                        PREVENT_OVERFLOW(1) *proxy_ptr++ = *input_ptr++;
+
+                        input_pos++;
+                        proxy->pos++;
+                    }
+                    else
+                    {
+                        proxy->state = STATE_INSIDE3;
+                        goto _label_inside3;
+                    }
+                }
+
+                return;
+
+            /*--------------------------------------------------------------------------------------------------------*/
+
+            _label_inside3:
+            case STATE_INSIDE3:
+
+                if(input_pos + proxy->etag_size <= INPUT_SIZE)
+                {
+                    if(memcmp(input_ptr, proxy->etag_buff, proxy->etag_size) == 0)
+                    {
+                        PREVENT_OVERFLOW(proxy->etag_size) memcpy(proxy_ptr, proxy->etag_buff, proxy->etag_size);
+
+                        input_ptr += proxy->etag_size;
+                        input_pos += proxy->etag_size;
+
+                        proxy_ptr += proxy->etag_size;
+                        proxy->pos += proxy->etag_size;
+
+                        proxy->state = STATE_INSIDE4;
+                        goto _label_inside4;
+                    }
+                    else
+                    {
+                        PREVENT_OVERFLOW(1) *proxy_ptr++ = *input_ptr++;
+
+                        input_pos++;
+                        proxy->pos++;
+
+                        proxy->state = STATE_INSIDE2;
+                        goto _label_inside2;
+                    }
+                }
+
+                memmove(proxy->residual_buff, input_ptr, proxy->residual_size = INPUT_SIZE - input_pos);
+
+                return;
+
+            /*--------------------------------------------------------------------------------------------------------*/
+
+            _label_inside4:
+            case STATE_INSIDE4:
+
+                *proxy_ptr = '\0';
+
+                proxy->emit_func(proxy, proxy->pos, proxy->buff);
+
+                proxy->state = STATE_OUTSIDE;
+                proxy->pos = 0x00000000000;
+                proxy_ptr = proxy->buff;
+
+                goto _label_outside;
 
             /*--------------------------------------------------------------------------------------------------------*/
         }

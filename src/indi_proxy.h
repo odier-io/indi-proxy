@@ -27,15 +27,15 @@ void indi_memory_finalize();
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-size_t indi_free(
+size_t indi_memory_free(
     buff_t buff
 );
 
-buff_t indi_alloc(
+buff_t indi_memory_alloc(
     size_t size
 );
 
-buff_t indi_realloc(
+buff_t indi_memory_realloc(
     buff_t buff,
     size_t size
 );
@@ -143,20 +143,21 @@ typedef void (* indi_emit_func_t)(struct indi_proxy_s *proxy, size_t size, str_t
 
 typedef struct indi_proxy_s
 {
+    size_t residual_size;
+    str_t residual_buff;
+
     size_t size;
     str_t buff;
 
-    size_t read_size;
-    size_t write_size;
+    int32_t state;
+    size_t pos;
 
-    size_t read_idx;
-    size_t write_idx;
-    size_t stag_idx;
-
-    STR_t etag;
-    buff_t user;
+    size_t etag_size;
+    BUFF_t etag_buff;
 
     indi_emit_func_t emit_func;
+
+    void *user;
 
 } indi_proxy_t;
 

@@ -22,7 +22,7 @@ indi_dict_t *indi_dict_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_dict_t *obj = indi_alloc(sizeof(indi_dict_t));
+    indi_dict_t *obj = indi_memory_alloc(sizeof(indi_dict_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -57,14 +57,14 @@ void indi_dict_free(indi_dict_t *obj)
 
         indi_object_free(temp->val);
 
-        indi_free(temp);
+        indi_memory_free(temp);
 
         /*------------------------------------------------------------------------------------------------------------*/
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_free(obj);
+    indi_memory_free(obj);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
@@ -94,7 +94,7 @@ void indi_dict_del(indi_dict_t *obj, STR_t key)
 
             indi_object_free(curr_node->val);
 
-            indi_free(curr_node);
+            indi_memory_free(curr_node);
 
             /*--------------------------------------------------------------------------------------------------------*/
 
@@ -167,7 +167,7 @@ void indi_dict_put(indi_dict_t *obj, STR_t key, buff_t val)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    node_t *node = indi_alloc(sizeof(node_t) + strlen(key) + 1);
+    node_t *node = indi_memory_alloc(sizeof(node_t) + strlen(key) + 1);
 
     node->key = strcpy((str_t) (node + 1), key);
 
@@ -208,7 +208,7 @@ str_t indi_dict_to_string(indi_dict_t *obj)
     /**/        /**/    indi_string_append(string, ":");
     /**/        /**/    indi_string_append(string, curr_node_val);
     /**/
-    /**/        indi_free(curr_node_val);
+    /**/        indi_memory_free(curr_node_val);
     /**/
     /**/        if(curr_node->next != NULL)
     /**/        {

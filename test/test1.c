@@ -7,7 +7,7 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static STR_t XML = "<defSwitchVector device=\"CCD Simulator\" name=\"CONNECTION\" label=\"Connection\" group=\"Main Control\" state=\"Ok\" perm=\"rw\" rule=\"OneOfMany\" timeout=\"60\" timestamp=\"2023-07-17T06:46:07\"><defSwitch name=\"CONNECT\" label=\"Connect\">On</defSwitch><defSwitch name=\"DISCONNECT\" label=\"Disconnect\">Off</defSwitch></defSwitchVector>\n";
+static STR_t XML = "<defSwitchVector device=\"CCD Simulator\" name=\"CONNECTION\" label=\"Connection\" group=\"Main Control\" state=\"Ok\" perm=\"rw\" rule=\"OneOfMany\" timeout=\"60\" timestamp=\"2023-07-17T06:46:07\"><defSwitch name=\"CONNECT\" label=\"Connect\">\nOn\n</defSwitch><defSwitch name=\"DISCONNECT\" label=\"Disconnect\">Off</defSwitch></defSwitchVector>\n";
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -50,9 +50,9 @@ int main()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_free(json2);
-    indi_free(xml);
-    indi_free(json1);
+    indi_memory_free(json2);
+    indi_memory_free(xml);
+    indi_memory_free(json1);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 

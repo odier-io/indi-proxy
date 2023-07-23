@@ -18,7 +18,7 @@ indi_list_t *indi_list_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_list_t *obj = indi_alloc(sizeof(indi_list_t));
+    indi_list_t *obj = indi_memory_alloc(sizeof(indi_list_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -53,14 +53,14 @@ void indi_list_free(indi_list_t *obj)
 
         indi_object_free(temp->val);
 
-        indi_free(temp);
+        indi_memory_free(temp);
 
         /*------------------------------------------------------------------------------------------------------------*/
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_free(obj);
+    indi_memory_free(obj);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
@@ -92,7 +92,7 @@ void indi_list_del(indi_list_t *obj, int idx)
 
             indi_object_free(curr_node->val);
 
-            indi_free(curr_node);
+            indi_memory_free(curr_node);
 
             /*--------------------------------------------------------------------------------------------------------*/
 
@@ -153,7 +153,7 @@ indi_list_t *indi_list_push(indi_list_t *obj, buff_t val)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    node_t *node = indi_alloc(sizeof(node_t));
+    node_t *node = indi_memory_alloc(sizeof(node_t));
 
     node->val = val;
     node->next = NULL;
@@ -190,7 +190,7 @@ str_t indi_list_to_string(indi_list_t *obj)
     /**/
     /**/        /**/    indi_string_append(sb, curr_node_val);
     /**/
-    /**/        indi_free(curr_node_val);
+    /**/        indi_memory_free(curr_node_val);
     /**/
     /**/        if(curr_node->next != NULL)
     /**/        {

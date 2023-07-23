@@ -28,7 +28,7 @@ static PyObject *py_indi_memory_finalize(PyObject *self, PyObject *args)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_free(PyObject *self, PyObject *args)
+static PyObject *py_indi_memory_free(PyObject *self, PyObject *args)
 {
     PyObject *py_object;
 
@@ -39,14 +39,14 @@ static PyObject *py_indi_free(PyObject *self, PyObject *args)
 
     buff_t object = PyLong_AsVoidPtr(py_object);
 
-    size_t result = indi_free(object);
+    size_t result = indi_memory_free(object);
 
     return PyLong_FromSize_t(result);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_alloc(PyObject *self, PyObject *args)
+static PyObject *py_indi_memory_alloc(PyObject *self, PyObject *args)
 {
     size_t size;
 
@@ -55,7 +55,7 @@ static PyObject *py_indi_alloc(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    buff_t result = indi_alloc(size);
+    buff_t result = indi_memory_alloc(size);
 
     return PyLong_FromVoidPtr(result);
 }
@@ -111,7 +111,7 @@ static PyObject *py_indi_object_to_string(PyObject *self, PyObject *args)
 
     str_t result = indi_object_to_string(object);
     PyObject *py_result = PyBytes_FromString(result);
-    indi_free(result);
+    indi_memory_free(result);
 
     return py_result;
 }
@@ -167,7 +167,7 @@ static PyObject *py_indi_xmldoc_to_string(PyObject *self, PyObject *args)
 
     buff_t result = indi_xmldoc_to_string(xmldoc);
     PyObject *py_result = PyBytes_FromString(result);
-    indi_free(result);
+    indi_memory_free(result);
 
     return py_result;
 }
@@ -250,7 +250,7 @@ static PyObject *py_indi_proxy_initialize(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    indi_proxy_t *proxy = (indi_proxy_t *) indi_alloc(sizeof(indi_proxy_t));
+    indi_proxy_t *proxy = (indi_proxy_t *) indi_memory_alloc(sizeof(indi_proxy_t));
 
     indi_proxy_initialize(proxy, size, py_indi_proxy_emit);
 
@@ -278,7 +278,7 @@ static PyObject *py_indi_proxy_finalize(PyObject *self, PyObject *args)
 
     indi_proxy_finalize(proxy);
 
-    indi_free(proxy);
+    indi_memory_free(proxy);
 
     Py_RETURN_NONE;
 }
@@ -310,8 +310,8 @@ static PyObject *py_indi_proxy_consume(PyObject *self, PyObject *args)
 static PyMethodDef indi_proxy_methods[] = {
     {"memory_initialize", py_indi_memory_initialize, METH_VARARGS, ""},
     {"memory_finalize", py_indi_memory_finalize, METH_VARARGS, ""},
-    {"indi_free", py_indi_free, METH_VARARGS, ""},
-    {"alloc", py_indi_alloc, METH_VARARGS, ""},
+    {"memory_free", py_indi_memory_free, METH_VARARGS, ""},
+    {"memory_alloc", py_indi_memory_alloc, METH_VARARGS, ""},
     /**/
     {"json_parse", py_indi_json_parse, METH_VARARGS, ""},
     {"object_free", py_indi_object_free, METH_VARARGS, ""},

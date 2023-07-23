@@ -30,7 +30,7 @@ static xmlNode *transform(indi_object_t *dict) // NOLINT(misc-no-recursion)
 
             xmlNodeSetName(node, /*--------*/ BAD_CAST val);
 
-            indi_free(val);
+            indi_memory_free(val);
         }
 
         /*------------------------------------------------------------------------------------------------------------*/
@@ -41,7 +41,7 @@ static xmlNode *transform(indi_object_t *dict) // NOLINT(misc-no-recursion)
 
             xmlNodeSetContent(node, /*--------*/ BAD_CAST val);
 
-            indi_free(val);
+            indi_memory_free(val);
         }
 
         /*------------------------------------------------------------------------------------------------------------*/
@@ -52,7 +52,7 @@ static xmlNode *transform(indi_object_t *dict) // NOLINT(misc-no-recursion)
 
             xmlNewProp(node, BAD_CAST (key + 1), BAD_CAST val);
 
-            indi_free(val);
+            indi_memory_free(val);
         }
 
         /*------------------------------------------------------------------------------------------------------------*/

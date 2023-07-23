@@ -8,7 +8,7 @@ indi_boolean_t *indi_boolean_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_boolean_t *obj = indi_alloc(sizeof(indi_boolean_t));
+    indi_boolean_t *obj = indi_memory_alloc(sizeof(indi_boolean_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
     
@@ -28,7 +28,7 @@ indi_boolean_t *indi_boolean_new()
 
 void indi_boolean_free(indi_boolean_t *obj)
 {
-    indi_free(obj);
+    indi_memory_free(obj);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

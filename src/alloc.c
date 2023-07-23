@@ -32,9 +32,9 @@ void indi_memory_initialize()
     used_mem = 0;
 
     xmlMemSetup(
-        (buff_t) indi_free,
-        (buff_t) indi_alloc,
-        (buff_t) indi_realloc,
+        (buff_t) indi_memory_free,
+        (buff_t) indi_memory_alloc,
+        (buff_t) indi_memory_realloc,
         (buff_t) indi_string_dup
     );
 }
@@ -57,7 +57,7 @@ void indi_memory_finalize()
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-size_t indi_free(buff_t buff)
+size_t indi_memory_free(buff_t buff)
 {
     if(buff == NULL)
     {
@@ -90,7 +90,7 @@ size_t indi_free(buff_t buff)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-buff_t indi_alloc(size_t size)
+buff_t indi_memory_alloc(size_t size)
 {
     if(size == 0x00)
     {
@@ -124,10 +124,10 @@ buff_t indi_alloc(size_t size)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-buff_t indi_realloc(buff_t buff, size_t size)
+buff_t indi_memory_realloc(buff_t buff, size_t size)
 {
     if(buff == NULL) {
-        return indi_alloc(size);
+        return indi_memory_alloc(size);
     }
 
     if(size == 0x00) {
@@ -182,10 +182,10 @@ str_t indi_boolean_dup(bool b)
     str_t str;
 
     if(b) {
-        str = strcpy(indi_alloc(4 + 1), "true");
+        str = strcpy(indi_memory_alloc(4 + 1), "true");
     }
     else {
-        str = strcpy(indi_alloc(5 + 1), "false");
+        str = strcpy(indi_memory_alloc(5 + 1), "false");
     }
 
     return str;
@@ -197,7 +197,7 @@ str_t indi_double_dup(double d)
 {
     if(!isnan(d))
     {
-        str_t str = indi_alloc(32 + 1);
+        str_t str = indi_memory_alloc(32 + 1);
 
         snprintf(str, 32, "%lf", d);
 
@@ -213,7 +213,7 @@ str_t indi_string_dup(STR_t s)
 {
     if(s != NULL)
     {
-        str_t str = indi_alloc(strlen(s));
+        str_t str = indi_memory_alloc(strlen(s));
 
         strcpy(str, s);
 

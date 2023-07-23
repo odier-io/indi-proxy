@@ -8,7 +8,7 @@ indi_number_t *indi_number_new()
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_number_t *obj = indi_alloc(sizeof(indi_number_t));
+    indi_number_t *obj = indi_memory_alloc(sizeof(indi_number_t));
 
     /*----------------------------------------------------------------------------------------------------------------*/
     
@@ -28,7 +28,7 @@ indi_number_t *indi_number_new()
 
 void indi_number_free(indi_number_t *obj)
 {
-    indi_free(obj);
+    indi_memory_free(obj);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
