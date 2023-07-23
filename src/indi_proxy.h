@@ -41,7 +41,7 @@ buff_t indi_memory_realloc(
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* JSON                                                                                                               */
+/* OBJECT                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 typedef enum
@@ -67,7 +67,7 @@ typedef struct
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_object_t *indi_json_parse(
+indi_object_t *indi_object_parse(
     STR_t text
 );
 
@@ -84,14 +84,14 @@ str_t indi_object_to_cstring(
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* XML                                                                                                                */
+/* XMLDOC                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 typedef struct _xmlDoc indi_xmldoc_t;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_xmldoc_t *indi_xml_parse(
+indi_xmldoc_t *indi_xmldoc_parse(
     STR_t text
 );
 
@@ -143,21 +143,20 @@ typedef void (* indi_emit_func_t)(struct indi_proxy_s *proxy, size_t size, str_t
 
 typedef struct indi_proxy_s
 {
+    indi_emit_func_t emit_func;
+
     size_t residual_size;
     str_t residual_buff;
 
-    size_t size;
-    str_t buff;
-
-    int32_t state;
-    size_t pos;
+    size_t message_size;
+    str_t message_buff;
 
     size_t etag_size;
     BUFF_t etag_buff;
 
-    indi_emit_func_t emit_func;
-
-    void *user;
+    int32_t state;
+    size_t pos;
+    void *py;
 
 } indi_proxy_t;
 

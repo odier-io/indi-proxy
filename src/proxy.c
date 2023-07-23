@@ -26,27 +26,29 @@ void indi_proxy_initialize(indi_proxy_t *proxy, size_t size, indi_emit_func_t em
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    proxy->emit_func = (emit_func != NULL) ? emit_func
+                                           : fake_emit
+    ;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     proxy->residual_size = 0x000000000000000000000;
     proxy->residual_buff = indi_memory_alloc(2048);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->size = /*-------------*/(size + 0);
-    proxy->buff = indi_memory_alloc(size + 1);
+    proxy->message_size = /*-------------*/(size + 0);
+    proxy->message_buff = indi_memory_alloc(size + 1);
 
     /*----------------------------------------------------------------------------------------------------------------*/
-
-    proxy->state = STATE_OUTSIDE;
-    proxy->pos = 0x00000000000;
 
     proxy->etag_size = 0x00;
     proxy->etag_buff = NULL;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->emit_func = (emit_func != NULL) ? emit_func
-                                           : fake_emit
-    ;
+    proxy->state = STATE_OUTSIDE;
+    proxy->pos = 0x00000000000;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
@@ -55,7 +57,7 @@ void indi_proxy_initialize(indi_proxy_t *proxy, size_t size, indi_emit_func_t em
 
 void indi_proxy_finalize(indi_proxy_t *proxy)
 {
-    indi_memory_free(proxy->/**/buff/**/);
+    indi_memory_free(proxy->/**/message_buff/**/);
 
     indi_memory_free(proxy->residual_buff);
 }
@@ -101,10 +103,10 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
     size_t input_pos = 0;
 
     size_t INPUT_SIZE = size;
-    size_t PROXY_SIZE = proxy->size;
+    size_t PROXY_SIZE = proxy->message_size;
 
     STR_t input_ptr = buff + 0x0000000;
-    str_t proxy_ptr = proxy->buff + proxy->pos;
+    str_t proxy_ptr = proxy->message_buff + proxy->pos;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -265,12 +267,12 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 
                 *proxy_ptr = '\0';
 
-                proxy->emit_func(proxy, proxy->pos, proxy->buff);
+                proxy->emit_func(proxy, proxy->pos, proxy->message_buff);
+
+                proxy_ptr = proxy->message_buff;
+                proxy->pos = 0x00000000000000000;
 
                 proxy->state = STATE_OUTSIDE;
-                proxy->pos = 0x00000000000;
-                proxy_ptr = proxy->buff;
-
                 goto _label_outside;
 
             /*--------------------------------------------------------------------------------------------------------*/

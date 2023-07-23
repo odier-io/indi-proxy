@@ -64,7 +64,7 @@ static PyObject *py_indi_memory_alloc(PyObject *self, PyObject *args)
 /* OBJECT                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_json_parse(PyObject *self, PyObject *args)
+static PyObject *py_indi_object_parse(PyObject *self, PyObject *args)
 {
     STR_t json;
 
@@ -73,7 +73,7 @@ static PyObject *py_indi_json_parse(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    indi_object_t *object = indi_json_parse(json);
+    indi_object_t *object = indi_object_parse(json);
 
     return PyLong_FromVoidPtr(object);
 }
@@ -120,7 +120,7 @@ static PyObject *py_indi_object_to_string(PyObject *self, PyObject *args)
 /* XML                                                                                                                */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_xml_parse(PyObject *self, PyObject *args)
+static PyObject *py_indi_xmldoc_parse(PyObject *self, PyObject *args)
 {
     STR_t xml;
 
@@ -129,7 +129,7 @@ static PyObject *py_indi_xml_parse(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    indi_xmldoc_t *result = indi_xml_parse(xml);
+    indi_xmldoc_t *result = indi_xmldoc_parse(xml);
 
     return PyLong_FromVoidPtr(result);
 }
@@ -223,7 +223,7 @@ static void py_indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
     PyObject *py_tuple = PyTuple_Pack(1, py_string);
 
     Py_XDECREF(PyObject_CallObject(
-        (PyObject *) proxy->user,
+        (PyObject *) proxy->py,
         py_tuple
     ));
 
@@ -254,7 +254,7 @@ static PyObject *py_indi_proxy_initialize(PyObject *self, PyObject *args)
 
     indi_proxy_initialize(proxy, size, py_indi_proxy_emit);
 
-    proxy->user = (buff_t) py_object;
+    proxy->py = (buff_t) py_object;
 
     Py_XINCREF(py_object);
 
@@ -274,7 +274,7 @@ static PyObject *py_indi_proxy_finalize(PyObject *self, PyObject *args)
 
     indi_proxy_t *proxy = (indi_proxy_t *) PyLong_AsVoidPtr(py_proxy);
 
-    Py_XDECREF((PyObject *) proxy->user);
+    Py_XDECREF((PyObject *) proxy->py);
 
     indi_proxy_finalize(proxy);
 
@@ -313,11 +313,11 @@ static PyMethodDef indi_proxy_methods[] = {
     {"memory_free", py_indi_memory_free, METH_VARARGS, ""},
     {"memory_alloc", py_indi_memory_alloc, METH_VARARGS, ""},
     /**/
-    {"json_parse", py_indi_json_parse, METH_VARARGS, ""},
+    {"object_parse", py_indi_object_parse, METH_VARARGS, ""},
     {"object_free", py_indi_object_free, METH_VARARGS, ""},
     {"object_to_string", py_indi_object_to_string, METH_VARARGS, ""},
     /**/
-    {"xml_parse", py_indi_xml_parse, METH_VARARGS, ""},
+    {"xmldoc_parse", py_indi_xmldoc_parse, METH_VARARGS, ""},
     {"xmldoc_free", py_indi_xmldoc_free, METH_VARARGS, ""},
     {"xmldoc_to_string", py_indi_xmldoc_to_string, METH_VARARGS, ""},
     /**/

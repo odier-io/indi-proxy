@@ -48,7 +48,7 @@ class Client(object):
 
     def emit(self, msg):
 
-        doc = indi_proxy.xml_parse(msg)
+        doc = indi_proxy.xmldoc_parse(msg)
 
         if doc != 0:
 

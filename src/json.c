@@ -518,7 +518,7 @@ _err:
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-indi_object_t *indi_json_parse(STR_t text)
+indi_object_t *indi_object_parse(STR_t text)
 {
     indi_object_t *result;
 

@@ -28,17 +28,17 @@ int main()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_xmldoc_t *doc1 = indi_xml_parse(XML);
+    indi_xmldoc_t *doc1 = indi_xmldoc_parse(XML);
     indi_object_t *obj1 = indi_xmldoc_to_object(doc1, true);
     str_t json1 = indi_object_to_string(obj1);
     indi_object_free(obj1);
     indi_xmldoc_free(doc1);
 
-    indi_object_t *test = indi_json_parse(json1);
+    indi_object_t *test = indi_object_parse(json1);
     str_t json2 = indi_object_to_string(test);
     indi_object_free(test);
 
-    indi_object_t *obj2 = indi_json_parse(json2);
+    indi_object_t *obj2 = indi_object_parse(json2);
     indi_xmldoc_t *doc2 = indi_object_to_xmldoc(obj2, false);
     str_t xml = indi_xmldoc_to_string(doc2);
     indi_xmldoc_free(doc2);

@@ -294,7 +294,7 @@
   <xs:element name="oneBLOB">
     <xs:complexType mixed="true">
       <xs:attribute name="name" use="required"/>
-      <xs:attribute name="size" use="required"/>
+      <xs:attribute name="message_size" use="required"/>
       <xs:attribute name="format" use="required"/>
     </xs:complexType>
   </xs:element>
