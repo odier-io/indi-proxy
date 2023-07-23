@@ -32,8 +32,8 @@ void indi_proxy_initialize(indi_proxy_t *proxy, size_t size, indi_emit_func_t em
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->residual_size = 0x000000000000000000000;
-    proxy->residual_buff = indi_memory_alloc(2048);
+    proxy->residual_size = 0x00000000000000000000000000;
+    proxy->residual_buff = indi_memory_alloc(10 * 1024);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
