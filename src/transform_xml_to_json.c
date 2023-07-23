@@ -48,13 +48,6 @@ static indi_object_t *transform(xmlNode *curr_node) // NOLINT(misc-no-recursion)
 
             break;
         }
-
-        if(new_node->type == XML_TEXT_NODE && strlen((str_t) new_node->content) > 0)
-        {
-            indi_dict_put(result, "$", indi_string_from((str_t) new_node->content));
-
-            break;
-        }
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
