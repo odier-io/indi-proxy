@@ -12,6 +12,10 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+#define MAGIC 0x7575757575757575
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 typedef struct
 {
     size_t size;
@@ -29,7 +33,7 @@ static size_t used_mem = 0;
 
 void indi_memory_initialize()
 {
-    used_mem = 0;
+    /*----------------------------------------------------------------------------------------------------------------*/
 
     xmlMemSetup(
         (buff_t) indi_memory_free,
@@ -37,6 +41,12 @@ void indi_memory_initialize()
         (buff_t) indi_memory_realloc,
         (buff_t) indi_string_dup
     );
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    used_mem = 0;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -68,7 +78,7 @@ size_t indi_memory_free(buff_t buff)
 
     block_t *block = (block_t *) buff - 1;
 
-    if(block->magic != 0x7575757575757575)
+    if(block->magic != MAGIC)
     {
         fprintf(stderr, "Memory corruption!\n");
         fflush(stderr);
@@ -99,6 +109,10 @@ buff_t indi_memory_alloc(size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    used_mem += size;
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     block_t *block = malloc(sizeof(block_t) + size);
 
     if(block == NULL)
@@ -110,10 +124,8 @@ buff_t indi_memory_alloc(size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    used_mem += size;
-
+    block->magic = MAGIC;
     block->size = size;
-    block->magic = 0x7575757575757575;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -138,7 +150,7 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
 
     block_t *old_block = (block_t *) buff - 1;
 
-    if(old_block->magic != 0x7575757575757575)
+    if(old_block->magic != MAGIC)
     {
         fprintf(stderr, "Memory corruption!\n");
         fflush(stderr);
@@ -147,7 +159,7 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    used_mem -= old_block->size;
+    used_mem = used_mem - old_block->size + size;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -162,10 +174,8 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    used_mem += size;
-
+    new_block->magic = MAGIC;
     new_block->size = size;
-    new_block->magic = 0x7575757575757575;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -233,7 +243,7 @@ void indi_object_free(indi_object_t *obj)
         return;
     }
 
-    if(obj->magic != 0x6565656565656565)
+    if(obj->magic != INDI_OBJECT_MAGIC)
     {
         fprintf(stderr, "Invalid object!\n");
         fflush(stderr);
@@ -282,7 +292,7 @@ str_t indi_object_to_string(const indi_object_t *obj)
         return NULL;
     }
 
-    if(obj->magic != 0x6565656565656565)
+    if(obj->magic != INDI_OBJECT_MAGIC)
     {
         fprintf(stderr, "Invalid object!\n");
         fflush(stderr);
@@ -325,7 +335,7 @@ str_t indi_object_to_cstring(const indi_object_t *obj)
         return NULL;
     }
 
-    if(obj->magic != 0x6565656565656565)
+    if(obj->magic != INDI_OBJECT_MAGIC)
     {
         fprintf(stderr, "Invalid object!\n");
         fflush(stderr);
