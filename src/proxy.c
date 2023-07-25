@@ -15,7 +15,7 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static void fake_emit(indi_proxy_t *proxy, size_t size, str_t buff)
+static void fake_emit(__USED__ indi_proxy_t *proxy, __USED__ size_t size, str_t buff)
 {
     printf("|%s|\n", buff);
 }
