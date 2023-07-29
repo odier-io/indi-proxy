@@ -12,6 +12,7 @@
 #define STATE_INSIDE2 300
 #define STATE_INSIDE3 400
 #define STATE_INSIDE4 500
+#define STATE_INSIDE5 600
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -202,8 +203,16 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
                             proxy->etag_size = strlen(E_TAGS[k]);
                             proxy->etag_buff = /*--*/(E_TAGS[k]);
 
-                            proxy->state = STATE_INSIDE2;
-                            goto _label_inside2;
+                            if(k < 10)
+                            {
+                                proxy->state = STATE_INSIDE2;
+                                goto _label_inside2;
+                            }
+                            else
+                            {
+                                proxy->state = STATE_INSIDE3;
+                                goto _label_inside3;
+                            }
                         }
                     }
                     else
@@ -243,8 +252,8 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
                     }
                     else
                     {
-                        proxy->state = STATE_INSIDE3;
-                        goto _label_inside3;
+                        proxy->state = STATE_INSIDE4;
+                        goto _label_inside4;
                     }
                 }
 
@@ -254,6 +263,29 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 
             _label_inside3:
             case STATE_INSIDE3:
+
+                while(input_pos < INPUT_SIZE)
+                {
+                    if(*input_ptr != '/')
+                    {
+                        PREVENT_OVERFLOW(1) *proxy_ptr++ = *input_ptr++;
+
+                        input_pos++;
+                        proxy->pos++;
+                    }
+                    else
+                    {
+                        proxy->state = STATE_INSIDE4;
+                        goto _label_inside4;
+                    }
+                }
+
+                return;
+
+            /*--------------------------------------------------------------------------------------------------------*/
+
+            _label_inside4:
+            case STATE_INSIDE4:
 
                 if(input_pos + proxy->etag_size <= INPUT_SIZE)
                 {
@@ -267,8 +299,8 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
                         proxy_ptr += proxy->etag_size;
                         proxy->pos += proxy->etag_size;
 
-                        proxy->state = STATE_INSIDE4;
-                        goto _label_inside4;
+                        proxy->state = STATE_INSIDE5;
+                        goto _label_inside5;
                     }
                     else
                     {
@@ -288,8 +320,8 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 
             /*--------------------------------------------------------------------------------------------------------*/
 
-            _label_inside4:
-            case STATE_INSIDE4:
+            _label_inside5:
+            case STATE_INSIDE5:
 
                 *proxy_ptr = '\0';
 

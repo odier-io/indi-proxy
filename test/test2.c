@@ -17,7 +17,7 @@ int main()
 
     indi_proxy_t proxy;
 
-    indi_proxy_initialize(&proxy, 38, NULL);
+    indi_proxy_initialize(&proxy, 400, NULL);
 
     for(int i = 0; i < 50; i++)
     {
@@ -46,6 +46,19 @@ int main()
             strlen("</defNumberVector>................................"),
             "</defNumberVector>................................"
         );
+
+        indi_proxy_consume(
+            &proxy,
+            strlen("<message device=\"Filter Simulator\" timestamp=\"2023-07-29T17:12:35\" message=\"[INFO] Setting current filter to slot 5\"/><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Busy\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">4</oneNumber></setNumberVector><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Ok\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">5</oneNumber></setNumberVector>"),
+            "<message device=\"Filter Simulator\" timestamp=\"2023-07-29T17:12:35\" message=\"[INFO] Setting current filter to slot 5\"/><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Busy\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">4</oneNumber></setNumberVector><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Ok\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">5</oneNumber></setNumberVector>"
+        );
+/*
+        indi_proxy_consume(
+            &proxy,
+            strlen("<message device=\"Filter Simulator\" timestamp=\"2023-07-29T17:12:35\" message=\"[INFO] Setting current filter to slot 5\"/><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Busy\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">4</oneNumber></setNumberVector><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Ok\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">5</oneNumber></setNumberVector>"),
+            "<message device=\"Filter Simulator\" timestamp=\"2023-07-29T17:12:35\" message=\"[INFO] Setting current filter to slot 5\"/><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Busy\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">4</oneNumber></setNumberVector><setNumberVector device=\"Filter Simulator\" name=\"FILTER_SLOT\" state=\"Ok\" timeout=\"60\" timestamp=\"2023-07-29T17:12:35\"><oneNumber name=\"FILTER_SLOT_VALUE\">5</oneNumber></setNumberVector>"
+        );
+*/
     }
 
     indi_proxy_finalize(&proxy);
