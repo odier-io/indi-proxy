@@ -129,8 +129,8 @@
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="label" type="xs:string" use="optional"/>
       <xs:attribute name="group" type="xs:string" use="optional"/>
-      <xs:attribute name="state" use="required" type="propertyState"/>
-      <xs:attribute name="perm" use="required" type="propertyPerm"/>
+      <xs:attribute name="state" type="propertyState" use="required"/>
+      <xs:attribute name="perm" type="propertyPerm" use="required"/>
       <xs:attribute name="timeout" type="xs:decimal" use="optional"/>
       <xs:attribute name="timestamp" type="xs:dateTime" use="optional"/>
       <xs:attribute name="message" type="xs:string" use="optional"/>
@@ -182,7 +182,7 @@
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="label" type="xs:string" use="optional"/>
       <xs:attribute name="group" type="xs:string" use="optional"/>
-      <xs:attribute name="state" use="required" type="propertyState"/>
+      <xs:attribute name="state" type="propertyState" use="required"/>
       <xs:attribute name="timestamp" type="xs:dateTime" use="optional"/>
       <xs:attribute name="message" type="xs:string" use="optional"/>
     </xs:complexType>
@@ -222,9 +222,9 @@
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="label" type="xs:string" use="optional"/>
       <xs:attribute name="group" type="xs:string" use="optional"/>
-      <xs:attribute name="state" use="required" type="propertyState"/>
-      <xs:attribute name="perm" use="required" type="propertyPerm"/>
-      <xs:attribute name="rule" use="required" type="switchRule"/>
+      <xs:attribute name="state" type="propertyState" use="required"/>
+      <xs:attribute name="perm" type="propertyPerm" use="required"/>
+      <xs:attribute name="rule" type="switchRule" use="required"/>
       <xs:attribute name="timeout" type="xs:decimal" use="optional"/>
       <xs:attribute name="timestamp" type="xs:dateTime" use="optional"/>
       <xs:attribute name="message" type="xs:string" use="optional"/>
@@ -276,8 +276,8 @@
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="label" type="xs:string" use="optional"/>
       <xs:attribute name="group" type="xs:string" use="optional"/>
-      <xs:attribute name="state" use="required" type="propertyState"/>
-      <xs:attribute name="perm" use="required" type="propertyPerm"/>
+      <xs:attribute name="state" type="propertyState" use="required"/>
+      <xs:attribute name="perm" type="propertyPerm" use="required"/>
       <xs:attribute name="timeout" type="xs:decimal" use="optional"/>
       <xs:attribute name="timestamp" type="xs:dateTime" use="optional"/>
       <xs:attribute name="message" type="xs:string" use="optional"/>
