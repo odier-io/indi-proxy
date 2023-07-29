@@ -3,7 +3,7 @@
 
 import indi_proxy
 
-from eventlet.green import socket
+import eventlet.green
 
 ########################################################################################################################
 
@@ -34,7 +34,7 @@ def main():
         _emit
     )
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock = eventlet.green.socket.socket(eventlet.green.socket.AF_INET, eventlet.green.socket.SOCK_STREAM)
 
     try:
 
