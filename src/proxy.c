@@ -65,21 +65,35 @@ void indi_proxy_finalize(indi_proxy_t *proxy)
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 static STR_t S_TAGS[] = {
+    /* Getters */
     "<defTextVector",
     "<defNumberVector",
     "<defSwitchVector",
     "<defLightVector",
     "<defBLOBVector",
+    /* Setters */
+    "<setTextVector",
+    "<setNumberVector",
+    "<setLightVector",
+    "<setSwitchVector",
+    "<setBLOBVector"
 };
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 static STR_t E_TAGS[] = {
+    /* Getters */
     "</defTextVector>",
     "</defNumberVector>",
     "</defSwitchVector>",
     "</defLightVector>",
     "</defBLOBVector>",
+    /* Setters */
+    "</setTextVector>",
+    "</setNumberVector>",
+    "</setLightVector>",
+    "</setSwitchVector>",
+    "</setBLOBVector>"
 };
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -158,7 +172,7 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 
                 all_tested = true;
 
-                for(size_t k = 0; k < 5; k++)
+                for(size_t k = 0; k < 10; k++)
                 {
                     size_t tag_size = strlen(S_TAGS[k]);
                     BUFF_t tag_buff = /*--*/(S_TAGS[k]);
