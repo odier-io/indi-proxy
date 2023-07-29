@@ -77,9 +77,6 @@ static STR_t S_TAGS[] = {
     "<setLightVector",
     "<setSwitchVector",
     "<setBLOBVector",
-    /* Properties */
-    "<getProperties",
-    "<enableBLOB",
 };
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -97,9 +94,6 @@ static STR_t E_TAGS[] = {
     "</setLightVector>",
     "</setSwitchVector>",
     "</setBLOBVector>",
-    /* Properties */
-    "</getProperties>",
-    "</enableBLOB>",
 };
 
 /*--------------------------------------------------------------------------------------------------------------------*/
