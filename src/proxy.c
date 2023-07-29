@@ -104,6 +104,10 @@ static STR_t E_TAGS[] = {
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+#define TAG_NB (sizeof(S_TAGS) / sizeof(STR_t))
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 #define PREVENT_OVERFLOW(size) \
                                                     \
             if(proxy->pos + (size) > PROXY_SIZE)    \
@@ -178,7 +182,7 @@ void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 
                 all_tested = true;
 
-                for(size_t k = 0; k < 5; k++)
+                for(size_t k = 0; k < TAG_NB; k++)
                 {
                     size_t tag_size = strlen(S_TAGS[k]);
                     BUFF_t tag_buff = /*--*/(S_TAGS[k]);
