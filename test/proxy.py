@@ -9,6 +9,10 @@ import indi_proxy
 
 ########################################################################################################################
 
+eventlet.monkey_patch()
+
+########################################################################################################################
+
 app = flask.Flask(__name__)
 
 ########################################################################################################################
@@ -17,20 +21,25 @@ class Client(object):
 
     ####################################################################################################################
 
-    def __init__(self, host, port):
+    def __init__(self):
 
-        self.host = host
-        self.port = port
+        ################################################################################################################
 
-        self.out_message_queue = eventlet.queue.Queue()
-        self.in_message_queue = eventlet.queue.Queue()
+        self.sock = eventlet.green.socket.socket(eventlet.green.socket.AF_INET, eventlet.green.socket.SOCK_STREAM)
+
+        self.host = None
+        self.port = None
+
+        ################################################################################################################
 
         indi_proxy.memory_initialize()
 
         self.proxy = indi_proxy.proxy_initialize(
             10 * 1024 * 1024,
-            self.emit
+            self._emit
         )
+
+        ################################################################################################################
 
         atexit.register(self.bye)
 
@@ -46,7 +55,50 @@ class Client(object):
 
     ####################################################################################################################
 
-    def emit(self, msg):
+    def start(self, host, port):
+
+        ################################################################################################################
+
+        self.host = host
+        self.port = port
+
+        ################################################################################################################
+
+        self.sock.connect((host, port, ))
+
+        ################################################################################################################
+
+        eventlet.spawn(self._receive_thread)
+
+        ################################################################################################################
+
+        self.send_message('<getProperties version="1.7" />')
+
+    ####################################################################################################################
+
+    def send_message(self, message):
+
+        self.sock.sendall(message.encode('utf-8'))
+
+    ####################################################################################################################
+
+    def _receive_thread(self):
+
+        while True:
+
+            try:
+
+                indi_proxy.proxy_consume(self.proxy, self.sock.recv(1024))
+
+            except Exception as e:
+
+                print(f'Error receiving message: {e.__str__()}')
+
+                eventlet.sleep(0.1)
+
+    ####################################################################################################################
+
+    def _emit(self, msg):
 
         doc = indi_proxy.xmldoc_parse(msg)
 
@@ -56,62 +108,11 @@ class Client(object):
 
             if obj != 0:
 
-                json = indi_proxy.object_to_string(obj)
-
-                print(json.decode('utf-8'))
-                print()
+                print(indi_proxy.object_to_string(obj).decode('utf-8'))
 
                 indi_proxy.xmldoc_free(doc)
 
             indi_proxy.object_free(obj)
-
-    ####################################################################################################################
-
-    def start(self):
-
-        ################################################################################################################
-
-        sock = eventlet.green.socket.socket(eventlet.green.socket.AF_INET, eventlet.green.socket.SOCK_STREAM)
-
-        sock.connect((self.host, self.port, ))
-
-        ################################################################################################################
-
-        #self.send_message('{"<>": "getProperties", "@version": "1.7"}')
-
-        self.send_message('<getProperties version="1.7" />')
-
-        ################################################################################################################
-
-        def receive_messages():
-
-            while True:
-
-                indi_proxy.proxy_consume(self.proxy, sock.recv(1024))
-
-        ################################################################################################################
-
-        def send_messages():
-
-            while True:
-
-                while not self.out_message_queue.empty():
-
-                    sock.sendall(self.out_message_queue.get().encode('utf-8'))
-
-                eventlet.sleep(0.1)
-
-        ################################################################################################################
-
-        eventlet.spawn_n(receive_messages)
-
-        eventlet.spawn_n(send_messages)
-
-    ####################################################################################################################
-
-    def send_message(self, message):
-
-        self.out_message_queue.put(message)
 
 ########################################################################################################################
 
@@ -124,12 +125,10 @@ def hello_world():
 
 if __name__ == '__main__':
 
-    eventlet.monkey_patch()
+    client = Client()
 
-    client = Client('localhost', 7624)
+    client.start('localhost', 7624)
 
-    eventlet.spawn(client.start)
-
-    app.run(host = '0.0.0.0', port = 5050, debug = True, threaded = True)
+    app.run(host = '0.0.0.0', port = 5050, debug = False)
 
 ########################################################################################################################
