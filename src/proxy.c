@@ -73,9 +73,9 @@ static STR_t S_TAGS[] = {
     "<defBLOBVector",
     /* Setters */
     "<setTextVector",
-    "<newNumberVector",
-    "<setLightVector",
+    "<setNumberVector",
     "<setSwitchVector",
+    "<setLightVector",
     "<setBLOBVector",
     /* Others */
     "<message",
@@ -93,9 +93,9 @@ static STR_t E_TAGS[] = {
     "</defBLOBVector>",
     /* Setters */
     "</setTextVector>",
-    "</newNumberVector>",
-    "</setLightVector>",
+    "</setNumberVector>",
     "</setSwitchVector>",
+    "</setLightVector>",
     "</setBLOBVector>",
     /* Others */
     "/>",
