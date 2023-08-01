@@ -335,7 +335,7 @@ static PyObject *PyIndiProxy_consume(PyIndiProxy *self, PyObject *args)
         return NULL;
     }
 
-    //indi_proxy_consume(&self->proxy, (size_t) size, (STR_t) buff);
+    indi_proxy_consume(&self->proxy, (size_t) size, (STR_t) buff);
 
     Py_RETURN_NONE;
 }
