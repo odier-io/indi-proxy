@@ -149,11 +149,11 @@ typedef struct indi_proxy_s
 {
     indi_emit_func_t emit_func;
 
-    size_t message_size;
-    str_t message_buff;
+    size_t xml_stream_size;
+    str_t xml_stream_buff;
 
-    size_t residual_size;
-    str_t residual_buff;
+    size_t xml_residual_size;
+    str_t xml_residual_buff;
 
     size_t etag_size;
     BUFF_t etag_buff;
@@ -168,8 +168,8 @@ typedef struct indi_proxy_s
 
 void indi_proxy_initialize(
     indi_proxy_t *proxy,
-    size_t message_buff_size,
-    size_t residual_buff_size,
+    size_t xml_stream_size,
+    size_t xml_residual_size,
     indi_emit_func_t emit_func
 );
 

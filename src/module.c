@@ -257,18 +257,20 @@ static PyObject *PyIndiXMLDoc_toObject(PyIndiXMLDoc *self, PyObject *args)
 
 static PyObject *PyIndiProxy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    return type->tp_alloc(type, 0);
+    PyIndiProxy *self = type->tp_alloc(type, 0);
+
+    self->proxy.py = NULL;
+
+    return self;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 static void PyIndiProxy_dealloc(PyIndiProxy *self)
 {
-    if(self->proxy.message_buff != NULL
-       ||
-       self->proxy.residual_buff != NULL
-    ) {
-        Py_DECREF((PyObject *) self->proxy.py);
+    if(self->proxy.py != NULL)
+    {
+        Py_DECREF(self->proxy.py);
 
         indi_proxy_finalize(&self->proxy);
     }
@@ -297,11 +299,11 @@ static void indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 
 static PyObject *PyIndiProxy_init(PyIndiProxy *self, PyObject *args)
 {
-    size_t message_buff_size;
-    size_t residual_buff_size;
+    size_t xml_stream_size;
+    size_t xml_residual_size;
     PyObject *py_callable;
 
-    if(!PyArg_ParseTuple(args, "nnO:", &message_buff_size, &residual_buff_size, &py_callable))
+    if(!PyArg_ParseTuple(args, "nnO:", &xml_stream_size, &xml_residual_size, &py_callable))
     {
         return NULL;
     }
@@ -315,8 +317,8 @@ static PyObject *PyIndiProxy_init(PyIndiProxy *self, PyObject *args)
 
     indi_proxy_initialize(
         &self->proxy,
-        message_buff_size,
-        residual_buff_size,
+        xml_stream_size,
+        xml_residual_size,
         indi_proxy_emit
     );
 
