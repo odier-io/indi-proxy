@@ -7,19 +7,52 @@
 #include "indi_proxy.h"
 
 /*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct
+{
+    PyObject_HEAD
+
+    indi_object_t *object;
+
+} PyIndiObject;
+
+static PyTypeObject PyIndiObjectType;
+
+static PyObject *PyIndiObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct
+{
+    PyObject_HEAD
+
+    indi_xmldoc_t *xmldoc;
+
+} PyIndiXMLDoc;
+
+static PyTypeObject PyIndiXMLDocType;
+
+static PyObject *PyIndiXMLDoc_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+typedef struct
+{
+    PyObject_HEAD
+
+    indi_proxy_t proxy;
+
+} PyIndiProxy;
+
+static PyTypeObject PyIndiProxyType;
+
+static PyObject *PyIndiProxy_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+
+/*--------------------------------------------------------------------------------------------------------------------*/
 /* MEMORY                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_memory_initialize(PyObject *self, PyObject *args)
-{
-    indi_memory_initialize();
-
-    Py_RETURN_NONE;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static PyObject *py_indi_memory_finalize(PyObject *self, PyObject *args)
+static PyObject *py_indi_cleanup(PyObject *self, PyObject *args)
 {
     indi_memory_finalize();
 
@@ -27,89 +60,61 @@ static PyObject *py_indi_memory_finalize(PyObject *self, PyObject *args)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-
-static PyObject *py_indi_memory_free(PyObject *self, PyObject *args)
-{
-    PyObject *py_object;
-
-    if(!PyArg_ParseTuple(args, "O", &py_object))
-    {
-        return NULL;
-    }
-
-    buff_t object = PyLong_AsVoidPtr(py_object);
-
-    size_t result = indi_memory_free(object);
-
-    return PyLong_FromSize_t(result);
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static PyObject *py_indi_memory_alloc(PyObject *self, PyObject *args)
-{
-    size_t size;
-
-    if(!PyArg_ParseTuple(args, "n", &size))
-    {
-        return NULL;
-    }
-
-    buff_t result = indi_memory_alloc(size);
-
-    return PyLong_FromVoidPtr(result);
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
 /* OBJECT                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_object_parse(PyObject *self, PyObject *args)
+static PyObject *PyIndiObject_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    PyIndiObject *self = (PyIndiObject *) type->tp_alloc(type, 0);
+
+    if(self != NULL)
+    {
+        self->object = NULL;
+    }
+
+    return (PyObject *) self;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static void PyIndiObject_dealloc(PyIndiObject *self)
+{
+    if(self->object)
+    {
+        indi_object_free(self->object);
+    }
+
+    Py_TYPE(self)->tp_free((PyObject *) self);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static int PyIndiObject_init(PyIndiObject *self, PyObject *args, PyObject *kwds)
 {
     STR_t json;
 
     if(!PyArg_ParseTuple(args, "y", &json))
     {
-        return NULL;
+        return -1;
     }
 
-    indi_object_t *object = indi_object_parse(json);
+    self->object = indi_object_parse(json);
 
-    return PyLong_FromVoidPtr(object);
+    if(self->object == NULL)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to parse JSON content");
+
+        return -1;
+    }
+
+    return 0;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_object_free(PyObject *self, PyObject *args)
+static PyObject *PyIndiObject_str(PyIndiObject *self)
 {
-    PyObject *py_object;
-
-    if(!PyArg_ParseTuple(args, "O", &py_object))
-    {
-        return NULL;
-    }
-
-    indi_object_t *object = (indi_object_t *) PyLong_AsVoidPtr(py_object);
-
-    indi_object_free(object);
-
-    Py_RETURN_NONE;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static PyObject *py_indi_object_to_string(PyObject *self, PyObject *args)
-{
-    PyObject *py_object;
-
-    if(!PyArg_ParseTuple(args, "O", &py_object))
-    {
-        return NULL;
-    }
-
-    indi_object_t *object = (indi_object_t *) PyLong_AsVoidPtr(py_object);
-
-    str_t result = indi_object_to_string(object);
+    str_t result = indi_object_to_string(self->object);
     PyObject *py_result = PyBytes_FromString(result);
     indi_memory_free(result);
 
@@ -117,55 +122,95 @@ static PyObject *py_indi_object_to_string(PyObject *self, PyObject *args)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* XML                                                                                                                */
-/*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_xmldoc_parse(PyObject *self, PyObject *args)
+static PyObject *PyIndiObject_toXMLDoc(PyIndiObject *self, PyObject *args)
 {
-    STR_t xml;
+    int validate;
 
-    if(!PyArg_ParseTuple(args, "y", &xml))
+    if(!PyArg_ParseTuple(args, "p", &validate))
     {
         return NULL;
     }
 
-    indi_xmldoc_t *result = indi_xmldoc_parse(xml);
+    indi_xmldoc_t *xmldoc = indi_object_to_xmldoc(self->object, validate);
 
-    return PyLong_FromVoidPtr(result);
+    if(xmldoc == NULL)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to convert to Object to XMLDoc");
+
+        return NULL;
+    }
+
+    PyIndiXMLDoc *py_xmldoc = (PyIndiXMLDoc *) PyIndiXMLDoc_new(&PyIndiXMLDocType, NULL, NULL);
+
+    if(py_xmldoc == NULL)
+    {
+        indi_xmldoc_free(xmldoc);
+
+        return NULL;
+    }
+
+    py_xmldoc->xmldoc = xmldoc;
+
+    return (PyObject *) py_xmldoc;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/* XMLDOC                                                                                                             */
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyObject *PyIndiXMLDoc_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    PyIndiXMLDoc *self = (PyIndiXMLDoc *) type->tp_alloc(type, 0);
+
+    if(self != NULL)
+    {
+        self->xmldoc = NULL;
+    }
+
+    return (PyObject *) self;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_xmldoc_free(PyObject *self, PyObject *args)
+static void PyIndiXMLDoc_dealloc(PyIndiXMLDoc *self)
 {
-    PyObject *py_object;
-
-    if(!PyArg_ParseTuple(args, "O", &py_object))
+    if(self->xmldoc)
     {
-        return NULL;
+        indi_xmldoc_free(self->xmldoc);
     }
 
-    indi_xmldoc_t *xmldoc = (indi_xmldoc_t *) PyLong_AsVoidPtr(py_object);
-
-    indi_xmldoc_free(xmldoc);
-
-    Py_RETURN_NONE;
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_xmldoc_to_string(PyObject *self, PyObject *args)
+static int PyIndiXMLDoc_init(PyIndiXMLDoc *self, PyObject *args, PyObject *kwds)
 {
-    PyObject *py_object;
+    STR_t json;
 
-    if(!PyArg_ParseTuple(args, "O", &py_object))
+    if(!PyArg_ParseTuple(args, "y", &json))
     {
-        return NULL;
+        return -1;
     }
 
-    indi_xmldoc_t *xmldoc = (indi_xmldoc_t *) PyLong_AsVoidPtr(py_object);
+    self->xmldoc = indi_xmldoc_parse(json);
 
-    buff_t result = indi_xmldoc_to_string(xmldoc);
+    if(self->xmldoc == NULL)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to parse XML content");
+
+        return -1;
+    }
+
+    return 0;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyObject *PyIndiXMLDoc_str(PyIndiXMLDoc *self)
+{
+    str_t result = indi_xmldoc_to_string(self->xmldoc);
     PyObject *py_result = PyBytes_FromString(result);
     indi_memory_free(result);
 
@@ -173,50 +218,65 @@ static PyObject *py_indi_xmldoc_to_string(PyObject *self, PyObject *args)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-/* TRANSFORM                                                                                                          */
-/*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_xmldoc_to_object(PyObject *self, PyObject *args)
+static PyObject *PyIndiXMLDoc_toObject(PyIndiXMLDoc *self, PyObject *args)
 {
-    PyObject *py_object;
     int validate;
 
-    if(!PyArg_ParseTuple(args, "Oi", &py_object, &validate))
+    if(!PyArg_ParseTuple(args, "p", &validate))
     {
         return NULL;
     }
 
-    indi_xmldoc_t *xmldoc = (indi_xmldoc_t *) PyLong_AsVoidPtr(py_object);
+    indi_object_t *object = indi_xmldoc_to_object(self->xmldoc, validate);
 
-    indi_object_t *result = indi_xmldoc_to_object(xmldoc, validate);
-
-    return PyLong_FromVoidPtr(result);
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static PyObject *py_indi_object_to_xmldoc(PyObject *self, PyObject *args)
-{
-    PyObject *py_object;
-    int validate;
-
-    if(!PyArg_ParseTuple(args, "Oi", &py_object, &validate))
+    if(object == NULL)
     {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to convert to object to xmldoc");
+
         return NULL;
     }
 
-    indi_object_t *object = (indi_object_t *) PyLong_AsVoidPtr(py_object);
+    PyIndiObject *py_object = (PyIndiObject *) PyIndiObject_new(&PyIndiObjectType, NULL, NULL);
 
-    indi_xmldoc_t *result = indi_object_to_xmldoc(object, validate);
+    if(py_object == NULL)
+    {
+        indi_object_free(object);
 
-    return PyLong_FromVoidPtr(result);
+        return NULL;
+    }
+
+    py_object->object = object;
+
+    return (PyObject *) py_object;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* PROXY                                                                                                              */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static void py_indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
+static PyObject *PyIndiProxy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    return type->tp_alloc(type, 0);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static void PyIndiProxy_dealloc(PyIndiProxy *self)
+{
+    if(self->proxy.message_buff != NULL
+       ||
+       self->proxy.residual_buff != NULL
+    ) {
+        indi_proxy_finalize(&self->proxy);
+    }
+
+    Py_TYPE(self)->tp_free((PyObject *) self);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static void indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 {
     PyObject *py_string = PyBytes_FromStringAndSize(buff, size);
 
@@ -233,73 +293,49 @@ static void py_indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_proxy_initialize(PyObject *self, PyObject *args)
+static PyObject *PyIndiProxy_init(PyIndiProxy *self, PyObject *args)
 {
-    size_t message_size;
-    size_t residual_size;
-    PyObject *py_object;
+    size_t message_buff_size;
+    size_t residual_buff_size;
+    PyObject *py_callable;
 
-    if(!PyArg_ParseTuple(args, "nnO:", &message_size, &residual_size, &py_object))
+    if(!PyArg_ParseTuple(args, "nnO:", &message_buff_size, &residual_buff_size, &py_callable))
     {
         return NULL;
     }
 
-    if(!PyCallable_Check(py_object))
+    if(!PyCallable_Check(py_callable))
     {
         PyErr_SetString(PyExc_TypeError, "Parameter must be callable");
 
         return NULL;
     }
 
-    indi_proxy_t *proxy = (indi_proxy_t *) indi_memory_alloc(sizeof(indi_proxy_t));
+    indi_proxy_initialize(
+        &self->proxy,
+        message_buff_size,
+        residual_buff_size,
+        indi_proxy_emit
+    );
 
-    indi_proxy_initialize(proxy, message_size, residual_size, py_indi_proxy_emit);
+    self->proxy.py = (buff_t) py_callable;
 
-    proxy->py = (buff_t) py_object;
-
-    Py_XINCREF(py_object);
-
-    return PyLong_FromVoidPtr(proxy);
+    return 0;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_proxy_finalize(PyObject *self, PyObject *args)
+static PyObject *PyIndiProxy_consume(PyIndiProxy *self, PyObject *args)
 {
-    PyObject *py_proxy;
-
-    if(!PyArg_ParseTuple(args, "O", &py_proxy))
-    {
-        return NULL;
-    }
-
-    indi_proxy_t *proxy = (indi_proxy_t *) PyLong_AsVoidPtr(py_proxy);
-
-    Py_XDECREF((PyObject *) proxy->py);
-
-    indi_proxy_finalize(proxy);
-
-    indi_memory_free(proxy);
-
-    Py_RETURN_NONE;
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-static PyObject *py_indi_proxy_consume(PyObject *self, PyObject *args)
-{
-    PyObject *py_proxy;
     STR_t buff;
     size_t size;
 
-    if(!PyArg_ParseTuple(args, "Oy#", &py_proxy, &buff, &size))
+    if(!PyArg_ParseTuple(args, "y#", &buff, &size))
     {
         return NULL;
     }
 
-    indi_proxy_t *proxy = (indi_proxy_t *) PyLong_AsVoidPtr(py_proxy);
-
-    indi_proxy_consume(proxy, (size_t) size, (STR_t) buff);
+    indi_proxy_consume(&self->proxy, (size_t) size, (STR_t) buff);
 
     Py_RETURN_NONE;
 }
@@ -308,26 +344,73 @@ static PyObject *py_indi_proxy_consume(PyObject *self, PyObject *args)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+static PyMethodDef PyIndiObject_methods[] = {
+    {"toXMLDoc", (PyCFunction) PyIndiObject_toXMLDoc, METH_VARARGS, "???"},
+    /**/
+    {NULL, NULL, 0, NULL} /* Sentinel */
+};
+
+static PyTypeObject PyIndiObjectType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "indi_proxy.IndiObject",
+    .tp_doc = "???",
+    .tp_basicsize = sizeof(PyIndiObject),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_new = (newfunc) PyIndiObject_new,
+    .tp_init = (initproc) PyIndiObject_init,
+    .tp_dealloc = (destructor) PyIndiObject_dealloc,
+    .tp_str = (reprfunc) PyIndiObject_str,
+    .tp_methods = PyIndiObject_methods,
+};
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyMethodDef PyIndiXMLDoc_methods[] = {
+    {"toObject", (PyCFunction) PyIndiXMLDoc_toObject, METH_VARARGS, "???"},
+    /**/
+    {NULL, NULL, 0, NULL} /* Sentinel */
+};
+
+static PyTypeObject PyIndiXMLDocType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "indi_proxy.IndiXMLDoc",
+    .tp_doc = "???",
+    .tp_basicsize = sizeof(PyIndiXMLDoc),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_new = (newfunc) PyIndiXMLDoc_new,
+    .tp_init = (initproc) PyIndiXMLDoc_init,
+    .tp_dealloc = (destructor) PyIndiXMLDoc_dealloc,
+    .tp_str = (reprfunc) PyIndiXMLDoc_str,
+    .tp_methods = PyIndiXMLDoc_methods,
+};
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyMethodDef PyIndiProxy_methods[] = {
+    {"consume", (PyCFunction) PyIndiProxy_consume, METH_VARARGS, "???"},
+    /**/
+    {NULL, NULL, 0, NULL} /* Sentinel */
+};
+
+static PyTypeObject PyIndiProxyType = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "indi_proxy.IndiProxy",
+    .tp_doc = "???",
+    .tp_basicsize = sizeof(PyIndiProxy),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_new = (newfunc) PyIndiProxy_new,
+    .tp_init = (initproc) PyIndiProxy_init,
+    .tp_dealloc = (destructor) PyIndiProxy_dealloc,
+    .tp_methods = PyIndiProxy_methods,
+};
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 static PyMethodDef indi_proxy_methods[] = {
-    {"memory_initialize", py_indi_memory_initialize, METH_VARARGS, ""},
-    {"memory_finalize", py_indi_memory_finalize, METH_VARARGS, ""},
-    {"memory_free", py_indi_memory_free, METH_VARARGS, ""},
-    {"memory_alloc", py_indi_memory_alloc, METH_VARARGS, ""},
-    /**/
-    {"object_parse", py_indi_object_parse, METH_VARARGS, ""},
-    {"object_free", py_indi_object_free, METH_VARARGS, ""},
-    {"object_to_string", py_indi_object_to_string, METH_VARARGS, ""},
-    /**/
-    {"xmldoc_parse", py_indi_xmldoc_parse, METH_VARARGS, ""},
-    {"xmldoc_free", py_indi_xmldoc_free, METH_VARARGS, ""},
-    {"xmldoc_to_string", py_indi_xmldoc_to_string, METH_VARARGS, ""},
-    /**/
-    {"xmldoc_to_object", py_indi_xmldoc_to_object, METH_VARARGS, ""},
-    {"object_to_xmldoc", py_indi_object_to_xmldoc, METH_VARARGS, ""},
-    /**/
-    {"proxy_initialize", py_indi_proxy_initialize, METH_VARARGS, ""},
-    {"proxy_finalize", py_indi_proxy_finalize, METH_VARARGS, ""},
-    {"proxy_consume", py_indi_proxy_consume, METH_VARARGS, ""},
+    {"cleanup", py_indi_cleanup, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
@@ -342,7 +425,65 @@ static struct PyModuleDef indi_proxy_module = {
 
 PyMODINIT_FUNC PyInit_indi_proxy(void)
 {
-    return PyModule_Create(&indi_proxy_module);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    indi_memory_initialize();
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    if(PyType_Ready(&PyIndiObjectType) < 0
+       ||
+       PyType_Ready(&PyIndiXMLDocType) < 0
+       ||
+       PyType_Ready(&PyIndiProxyType) < 0
+    ) {
+        return NULL;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    PyObject *module = PyModule_Create(&indi_proxy_module);
+
+    if(module == NULL)
+    {
+        return NULL;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    Py_INCREF(&PyIndiObjectType);
+
+    if(PyModule_AddObject(module, "IndiObject", (PyObject *) &PyIndiObjectType) < 0)
+    {
+        Py_DECREF(&PyIndiObjectType);
+        Py_DECREF(module);
+
+        return NULL;
+    }
+
+    Py_INCREF(&PyIndiXMLDocType);
+
+    if(PyModule_AddObject(module, "IndiXMLDoc", (PyObject *) &PyIndiXMLDocType) < 0)
+    {
+        Py_DECREF(&PyIndiXMLDocType);
+        Py_DECREF(module);
+
+        return NULL;
+    }
+
+    Py_INCREF(&PyIndiProxyType);
+
+    if(PyModule_AddObject(module, "IndiProxy", (PyObject *) &PyIndiProxyType) < 0)
+    {
+        Py_DECREF(&PyIndiProxyType);
+        Py_DECREF(module);
+
+        return NULL;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    return module;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
