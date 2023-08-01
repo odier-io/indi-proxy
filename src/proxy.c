@@ -125,6 +125,7 @@ static STR_t E_TAGS[] = {
 
 void indi_proxy_consume(indi_proxy_t *proxy, size_t size, STR_t buff)
 {
+    return;
     bool all_tested;
 
     size_t input_pos = 0;
