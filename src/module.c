@@ -268,6 +268,8 @@ static void PyIndiProxy_dealloc(PyIndiProxy *self)
        ||
        self->proxy.residual_buff != NULL
     ) {
+        Py_DECREF((PyObject *) self->proxy.py);
+
         indi_proxy_finalize(&self->proxy);
     }
 
@@ -281,12 +283,12 @@ static void indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
     PyObject *py_string = PyBytes_FromStringAndSize(buff, size);
 
     PyObject *py_tuple = PyTuple_Pack(1, py_string);
-/*
+
     Py_XDECREF(PyObject_CallObject(
         (PyObject *) proxy->py,
         py_tuple
     ));
-*/
+
     Py_DECREF(py_tuple);
     Py_DECREF(py_string);
 }
@@ -317,6 +319,8 @@ static PyObject *PyIndiProxy_init(PyIndiProxy *self, PyObject *args)
         residual_buff_size,
         indi_proxy_emit
     );
+
+    Py_INCREF(py_callable);
 
     self->proxy.py = (buff_t) py_callable;
 
