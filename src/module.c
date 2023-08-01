@@ -258,7 +258,7 @@ static PyObject *PyIndiXMLDoc_toObject(PyIndiXMLDoc *self, PyObject *args)
 
 static PyObject *PyIndiProxy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    printf("1)\n");
+    fprintf(stderr, "1)\n");
 
     return type->tp_alloc(type, 0);
 }
@@ -267,7 +267,7 @@ static PyObject *PyIndiProxy_new(PyTypeObject *type, PyObject *args, PyObject *k
 
 static void PyIndiProxy_dealloc(PyIndiProxy *self)
 {
-    printf("2)\n");
+    fprintf(stderr, "2)\n");
 
     if(self->proxy.message_buff != NULL
        ||
@@ -300,7 +300,7 @@ static void indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 
 static PyObject *PyIndiProxy_init(PyIndiProxy *self, PyObject *args)
 {
-    printf("3)\n");
+    fprintf(stderr, "3)\n");
 
     size_t message_buff_size;
     size_t residual_buff_size;
@@ -334,7 +334,7 @@ static PyObject *PyIndiProxy_init(PyIndiProxy *self, PyObject *args)
 
 static PyObject *PyIndiProxy_consume(PyIndiProxy *self, PyObject *args)
 {
-    printf("4)\n");
+    fprintf(stderr, "4)\n");
 
     STR_t buff;
     size_t size;
