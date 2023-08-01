@@ -235,10 +235,11 @@ static void py_indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 
 static PyObject *py_indi_proxy_initialize(PyObject *self, PyObject *args)
 {
-    size_t size;
+    size_t message_size;
+    size_t residual_size;
     PyObject *py_object;
 
-    if(!PyArg_ParseTuple(args, "nO:", &size, &py_object))
+    if(!PyArg_ParseTuple(args, "nnO:", &message_size, &residual_size, &py_object))
     {
         return NULL;
     }
@@ -252,7 +253,7 @@ static PyObject *py_indi_proxy_initialize(PyObject *self, PyObject *args)
 
     indi_proxy_t *proxy = (indi_proxy_t *) indi_memory_alloc(sizeof(indi_proxy_t));
 
-    indi_proxy_initialize(proxy, size, py_indi_proxy_emit);
+    indi_proxy_initialize(proxy, message_size, residual_size, py_indi_proxy_emit);
 
     proxy->py = (buff_t) py_object;
 

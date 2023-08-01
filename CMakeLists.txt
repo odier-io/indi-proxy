@@ -39,6 +39,14 @@ set(SOURCE_FILES
 
 ########################################################################################################################
 
+if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+    list(APPEND SOURCE_FILES
+        src/control.c
+    )
+endif()
+
+########################################################################################################################
+
 add_library(indi-proxy-static STATIC ${SOURCE_FILES})
 
 target_include_directories(indi-proxy-static PRIVATE ${LIBXML2_INCLUDE_DIR})

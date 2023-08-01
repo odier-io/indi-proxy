@@ -149,11 +149,11 @@ typedef struct indi_proxy_s
 {
     indi_emit_func_t emit_func;
 
-    size_t residual_size;
-    str_t residual_buff;
-
     size_t message_size;
     str_t message_buff;
+
+    size_t residual_size;
+    str_t residual_buff;
 
     size_t etag_size;
     BUFF_t etag_buff;
@@ -168,7 +168,8 @@ typedef struct indi_proxy_s
 
 void indi_proxy_initialize(
     indi_proxy_t *proxy,
-    size_t size,
+    size_t message_buff_size,
+    size_t residual_buff_size,
     indi_emit_func_t emit_func
 );
 
@@ -180,6 +181,23 @@ void indi_proxy_consume(
     indi_proxy_t *proxy,
     size_t size,
     STR_t buff
+);
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/* CONTROL                                                                                                            */
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+str_t indi_driver_list(
+    STR_t path
+);
+
+int indi_server_start(
+    STR_t path,
+    STR_t json
+);
+
+int indi_server_stop(
+    int pid
 );
 
 /*--------------------------------------------------------------------------------------------------------------------*/

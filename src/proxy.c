@@ -23,7 +23,7 @@ static void fake_emit(__USED__ indi_proxy_t *proxy, __USED__ size_t size, str_t 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void indi_proxy_initialize(indi_proxy_t *proxy, size_t size, indi_emit_func_t emit_func)
+void indi_proxy_initialize(indi_proxy_t *proxy, size_t message_buff_size, size_t residual_buff_size, indi_emit_func_t emit_func)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -33,13 +33,13 @@ void indi_proxy_initialize(indi_proxy_t *proxy, size_t size, indi_emit_func_t em
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->residual_size = /*-------------*/(0x0000000);
-    proxy->residual_buff = indi_memory_alloc(10 * 1024);
+    proxy->message_size = /*-------------*/(message_buff_size + 0);
+    proxy->message_buff = indi_memory_alloc(message_buff_size + 1);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    proxy->message_size = /*-------------*/(size + 0);
-    proxy->message_buff = indi_memory_alloc(size + 1);
+    proxy->residual_size = /*-------------*/(0x0000000000000000 + 0);
+    proxy->residual_buff = indi_memory_alloc(residual_buff_size + 1);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 

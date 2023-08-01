@@ -11,6 +11,8 @@
 
 #define __USED__ __attribute__ ((unused))
 
+#define __NORETURN__ __attribute__ ((noreturn))
+
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* MEMORY                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -249,6 +251,10 @@ void indi_dict_put(
     buff_t val
 );
 
+size_t indi_dict_size(
+    indi_dict_t *obj
+);
+
 str_t indi_dict_to_string(
     indi_dict_t *obj
 );
@@ -310,6 +316,10 @@ indi_object_t *indi_list_get(
 indi_list_t *indi_list_push(
     indi_list_t *obj,
     buff_t val
+);
+
+size_t indi_list_size(
+    indi_list_t *obj
 );
 
 str_t indi_list_to_string(
