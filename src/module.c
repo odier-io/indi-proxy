@@ -283,6 +283,7 @@ static void PyIndiProxy_dealloc(PyIndiProxy *self)
 
 static void indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 {
+    /*
     PyObject *py_string = PyBytes_FromStringAndSize(buff, size);
 
     PyObject *py_tuple = PyTuple_Pack(1, py_string);
@@ -294,6 +295,7 @@ static void indi_proxy_emit(indi_proxy_t *proxy, size_t size, str_t buff)
 
     Py_DECREF(py_tuple);
     Py_DECREF(py_string);
+    */
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
