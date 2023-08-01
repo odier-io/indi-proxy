@@ -112,7 +112,7 @@ static int PyIndiObject_init(PyIndiObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *PyIndiObject_str(PyIndiObject *self)
+static PyObject *PyIndiObject_toBytes(PyIndiObject *self)
 {
     str_t result = indi_object_to_string(self->object);
     PyObject *py_result = PyBytes_FromString(result);
@@ -208,7 +208,7 @@ static int PyIndiXMLDoc_init(PyIndiXMLDoc *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *PyIndiXMLDoc_str(PyIndiXMLDoc *self)
+static PyObject *PyIndiXMLDoc_toBytes(PyIndiXMLDoc *self)
 {
     str_t result = indi_xmldoc_to_string(self->xmldoc);
     PyObject *py_result = PyBytes_FromString(result);
@@ -346,6 +346,7 @@ static PyObject *PyIndiProxy_consume(PyIndiProxy *self, PyObject *args)
 
 static PyMethodDef PyIndiObject_methods[] = {
     {"toXMLDoc", (PyCFunction) PyIndiObject_toXMLDoc, METH_VARARGS, "???"},
+    {"toBytes", (PyCFunction) PyIndiObject_toBytes, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
@@ -360,7 +361,6 @@ static PyTypeObject PyIndiObjectType = {
     .tp_new = (newfunc) PyIndiObject_new,
     .tp_init = (initproc) PyIndiObject_init,
     .tp_dealloc = (destructor) PyIndiObject_dealloc,
-    .tp_str = (reprfunc) PyIndiObject_str,
     .tp_methods = PyIndiObject_methods,
 };
 
@@ -368,6 +368,7 @@ static PyTypeObject PyIndiObjectType = {
 
 static PyMethodDef PyIndiXMLDoc_methods[] = {
     {"toObject", (PyCFunction) PyIndiXMLDoc_toObject, METH_VARARGS, "???"},
+    {"toBytes", (PyCFunction) PyIndiXMLDoc_toBytes, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
@@ -382,7 +383,6 @@ static PyTypeObject PyIndiXMLDocType = {
     .tp_new = (newfunc) PyIndiXMLDoc_new,
     .tp_init = (initproc) PyIndiXMLDoc_init,
     .tp_dealloc = (destructor) PyIndiXMLDoc_dealloc,
-    .tp_str = (reprfunc) PyIndiXMLDoc_str,
     .tp_methods = PyIndiXMLDoc_methods,
 };
 
