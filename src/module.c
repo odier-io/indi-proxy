@@ -112,6 +112,17 @@ static int PyIndiObject_init(PyIndiObject *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+static PyObject *PyIndiObject_toString(PyIndiObject *self)
+{
+    str_t result = indi_object_to_string(self->object);
+    PyObject *py_result = PyUnicode_FromString(result);
+    indi_memory_free(result);
+
+    return py_result;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 static PyObject *PyIndiObject_toBytes(PyIndiObject *self)
 {
     str_t result = indi_object_to_string(self->object);
@@ -208,6 +219,17 @@ static int PyIndiXMLDoc_init(PyIndiXMLDoc *self, PyObject *args, PyObject *kwds)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+static PyObject *PyIndiXMLDoc_toString(PyIndiXMLDoc *self)
+{
+    str_t result = indi_xmldoc_to_string(self->xmldoc);
+    PyObject *py_result = PyUnicode_FromString(result);
+    indi_memory_free(result);
+
+    return py_result;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 static PyObject *PyIndiXMLDoc_toBytes(PyIndiXMLDoc *self)
 {
     str_t result = indi_xmldoc_to_string(self->xmldoc);
@@ -257,11 +279,11 @@ static PyObject *PyIndiXMLDoc_toObject(PyIndiXMLDoc *self, PyObject *args)
 
 static PyObject *PyIndiProxy_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    PyIndiProxy *self = type->tp_alloc(type, 0);
+    PyIndiProxy *self = (PyIndiProxy *) type->tp_alloc(type, 0);
 
     self->proxy.py = NULL;
 
-    return self;
+    return (PyObject *) self;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -352,6 +374,7 @@ static PyObject *PyIndiProxy_consume(PyIndiProxy *self, PyObject *args)
 
 static PyMethodDef PyIndiObject_methods[] = {
     {"toXMLDoc", (PyCFunction) PyIndiObject_toXMLDoc, METH_VARARGS, "???"},
+    {"toString", (PyCFunction) PyIndiObject_toString, METH_VARARGS, "???"},
     {"toBytes", (PyCFunction) PyIndiObject_toBytes, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
@@ -374,6 +397,7 @@ static PyTypeObject PyIndiObjectType = {
 
 static PyMethodDef PyIndiXMLDoc_methods[] = {
     {"toObject", (PyCFunction) PyIndiXMLDoc_toObject, METH_VARARGS, "???"},
+    {"toString", (PyCFunction) PyIndiXMLDoc_toString, METH_VARARGS, "???"},
     {"toBytes", (PyCFunction) PyIndiXMLDoc_toBytes, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
