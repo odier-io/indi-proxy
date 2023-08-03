@@ -38,7 +38,8 @@ str_t indi_driver_list(STR_t path)
         {
             indi_dict_t *dict2 = indi_dict_new();
             indi_dict_put(dict2, "<>", indi_string_from("defDriver"));
-            indi_dict_put(dict2, "@name", indi_string_from(entry->d_name));
+            indi_dict_put(dict2, "@name", indi_string_from(entry->d_name + 5));
+            indi_dict_put(dict2, "@driver", indi_string_from(entry->d_name + 0));
 
             indi_list_push(list, dict2);
         }
