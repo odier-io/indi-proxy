@@ -35,7 +35,7 @@ str_t indi_driver_list(STR_t path)
     {
         if(strncmp(entry->d_name, "indi_", 5) == 0)
         {
-            indi_list_push(list, indi_string_from(entry->d_name));
+            indi_list_push(list, indi_string_from(entry->d_name + 5));
         }
     }
 
