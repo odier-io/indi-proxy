@@ -35,15 +35,9 @@ set(SOURCE_FILES
     src/transform_xml_to_json.c
     src/validation.c
     src/xml.c
+    #
+    src/control.c
 )
-
-########################################################################################################################
-
-if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-    list(APPEND SOURCE_FILES
-        src/control.c
-    )
-endif()
 
 ########################################################################################################################
 

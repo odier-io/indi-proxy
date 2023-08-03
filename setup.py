@@ -23,6 +23,8 @@ indi_proxy_module = Extension(
         'src/validation.c',
         'src/xml.c',
         #
+        'src/control.c',
+        #
         'src/module.c',
     ]
 )
