@@ -52,7 +52,7 @@ static PyObject *PyIndiProxy_new(PyTypeObject *type, PyObject *args, PyObject *k
 /* MEMORY                                                                                                             */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_cleanup(PyObject *self, PyObject *args)
+static PyObject *py_indi_cleanup(PyObject *self)
 {
     indi_memory_finalize();
 
@@ -369,6 +369,19 @@ static PyObject *PyIndiProxy_consume(PyIndiProxy *self, PyObject *args)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
+/* CONTROL                                                                                                            */
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyObject *py_indi_driver_list(PyObject *self)
+{
+    str_t result = indi_driver_list("/Applications/kstars.app/Contents/MacOS");
+    PyObject *py_result = PyUnicode_FromString(result);
+    indi_memory_free(result);
+
+    return py_result;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -440,7 +453,8 @@ static PyTypeObject PyIndiProxyType = {
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 static PyMethodDef indi_proxy_methods[] = {
-    {"cleanup", py_indi_cleanup, METH_VARARGS, "???"},
+    {"cleanup", py_indi_cleanup, METH_NOARGS, "???"},
+    {"driver_list", py_indi_driver_list, METH_NOARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
