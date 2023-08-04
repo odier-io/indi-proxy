@@ -25,33 +25,32 @@ str_t indi_driver_list(STR_t path)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_list_t *list;
-    struct dirent *entry;
+    indi_dict_t *dict = indi_dict_new();
+    indi_list_t *list = indi_list_new();
 
-    indi_dict_t *dict1 = indi_dict_new();
-    indi_dict_put(dict1, "<>", indi_string_from("drivers"));
-    indi_dict_put(dict1, "children", list = indi_list_new());
+    indi_dict_put(dict, "<>", indi_string_from("drivers"));
+
+    indi_dict_put(dict, "driver_list", list);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    struct dirent *entry;
 
     while((entry = readdir(dir)) != NULL)
     {
         if(strncmp(entry->d_name, "indi_", 5) == 0)
         {
-            indi_dict_t *dict2 = indi_dict_new();
-            indi_dict_put(dict2, "<>", indi_string_from("defDriver"));
-            indi_dict_put(dict2, "@name", indi_string_from(entry->d_name + 5));
-            indi_dict_put(dict2, "@driver", indi_string_from(entry->d_name + 0));
-
-            indi_list_push(list, dict2);
+            indi_list_push(list, indi_string_from(entry->d_name + 5));
         }
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    str_t result = indi_dict_to_string(dict1);
+    str_t result = indi_dict_to_string(dict);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_dict_free(dict1);
+    indi_dict_free(dict);
 
     closedir(dir);
 
