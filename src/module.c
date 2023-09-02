@@ -383,7 +383,7 @@ static PyObject *py_indi_driver_list(PyIndiObject *self, PyObject *args, PyObjec
 
     str_t result = indi_driver_list(path);
 
-    if(result != NULL)
+    if(result == NULL)
     {
         PyErr_SetString(PyExc_RuntimeError, "Failed to find INDI drivers");
 
