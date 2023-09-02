@@ -385,14 +385,40 @@ static PyObject *py_indi_driver_list(PyIndiObject *self, PyObject *args, PyObjec
 
     if(result != NULL)
     {
-        PyObject *py_result = PyUnicode_FromString(result);
+        PyErr_SetString(PyExc_RuntimeError, "Failed to find INDI drivers");
 
-        indi_memory_free(result);
-
-        return py_result;
+        return NULL;
     }
 
-    Py_RETURN_NONE;
+    PyObject *py_result = PyUnicode_FromString(result);
+
+    indi_memory_free(result);
+
+    return py_result;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyObject *py_indi_server_start(PyIndiObject *self, PyObject *args, PyObject *kwds)
+{
+    STR_t path;
+    STR_t json;
+
+    if(!PyArg_ParseTuple(args, "ss", &path, &json))
+    {
+        return NULL;
+    }
+
+    int result = indi_server_start(path, json);
+
+    if (result < 0)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to start INDI server");
+
+        return NULL;
+    }
+
+    return PyLong_FromLong((long) result);
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -469,6 +495,7 @@ static PyTypeObject PyIndiProxyType = {
 static PyMethodDef indi_proxy_methods[] = {
     {"cleanup", (PyCFunction) py_indi_cleanup, METH_NOARGS, "???"},
     {"driver_list", (PyCFunction) py_indi_driver_list, METH_VARARGS, "???"},
+    {"indi_server_start", (PyCFunction) py_indi_server_start, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
