@@ -372,9 +372,16 @@ static PyObject *PyIndiProxy_consume(PyIndiProxy *self, PyObject *args)
 /* CONTROL                                                                                                            */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_driver_list(PyObject *self)
+static PyObject *py_indi_driver_list(PyIndiObject *self, PyObject *args, PyObject *kwds)
 {
-    str_t result = indi_driver_list("/Applications/kstars.app/Contents/MacOS");
+    STR_t path;
+
+    if(!PyArg_ParseTuple(args, "s", &path))
+    {
+        return NULL;
+    }
+
+    str_t result = indi_driver_list(path);
     PyObject *py_result = PyUnicode_FromString(result);
     indi_memory_free(result);
 
@@ -454,7 +461,7 @@ static PyTypeObject PyIndiProxyType = {
 
 static PyMethodDef indi_proxy_methods[] = {
     {"cleanup", (PyCFunction) py_indi_cleanup, METH_NOARGS, "???"},
-    {"driver_list", (PyCFunction) py_indi_driver_list, METH_NOARGS, "???"},
+    {"driver_list", (PyCFunction) py_indi_driver_list, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
