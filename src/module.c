@@ -495,7 +495,7 @@ static PyTypeObject PyIndiProxyType = {
 static PyMethodDef indi_proxy_methods[] = {
     {"cleanup", (PyCFunction) py_indi_cleanup, METH_NOARGS, "???"},
     {"driver_list", (PyCFunction) py_indi_driver_list, METH_VARARGS, "???"},
-    {"indi_server_start", (PyCFunction) py_indi_server_start, METH_VARARGS, "???"},
+    {"server_start", (PyCFunction) py_indi_server_start, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
