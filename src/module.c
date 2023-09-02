@@ -382,10 +382,17 @@ static PyObject *py_indi_driver_list(PyIndiObject *self, PyObject *args, PyObjec
     }
 
     str_t result = indi_driver_list(path);
-    PyObject *py_result = PyUnicode_FromString(result);
-    indi_memory_free(result);
 
-    return py_result;
+    if(result != NULL)
+    {
+        PyObject *py_result = PyUnicode_FromString(result);
+
+        indi_memory_free(result);
+
+        return py_result;
+    }
+
+    Py_RETURN_NONE;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
