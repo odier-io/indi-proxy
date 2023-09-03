@@ -77,6 +77,8 @@ static __NORETURN__ int indi_server_exec(STR_t path, indi_list_t *list)
     for(indi_list_iter_t iter = INDI_LIST_ITER(list); indi_list_iterate(&iter, &idx, &obj);)
     {
         argv[idx] = indi_object_to_cstring(obj);
+
+        printf("%s\n", argv[idx]);
     }
 
     argv[size] = NULL;
@@ -90,8 +92,6 @@ static __NORETURN__ int indi_server_exec(STR_t path, indi_list_t *list)
     for(size_t i = 0; i < size; i++)
     {
         indi_memory_free(argv[i]);
-
-        printf("%s\n",argv[i] );
     }
 
     indi_memory_free(argv);
