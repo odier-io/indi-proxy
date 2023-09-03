@@ -411,7 +411,7 @@ static PyObject *py_indi_server_start(PyIndiObject *self, PyObject *args, PyObje
 
     int result = indi_server_start(path, json);
 
-    if (result < 0)
+    if(result < 0)
     {
         PyErr_SetString(PyExc_RuntimeError, "Failed to start INDI server");
 
@@ -423,18 +423,11 @@ static PyObject *py_indi_server_start(PyIndiObject *self, PyObject *args, PyObje
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static PyObject *py_indi_server_stop(PyIndiObject *self, PyObject *args, PyObject *kwds)
+static PyObject *py_indi_server_stop(PyObject *self)
 {
-    int pid;
+    int result = indi_server_stop();
 
-    if(!PyArg_ParseTuple(args, "i", &pid))
-    {
-        return NULL;
-    }
-
-    int result = indi_server_stop(pid);
-
-    if (result < 0)
+    if(result < 0)
     {
         PyErr_SetString(PyExc_RuntimeError, "Failed to stop INDI server");
 

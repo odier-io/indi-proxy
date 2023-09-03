@@ -196,7 +196,7 @@ int indi_server_start(STR_t path, STR_t json)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-int indi_server_stop(int pid)
+int indi_server_stop()
 {
     return system("pkill indiserver");
 }
