@@ -1,4 +1,5 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
+#include <stdio.h>
 
 #include <dirent.h>
 #include <signal.h>
@@ -89,6 +90,8 @@ static __NORETURN__ int indi_server_exec(STR_t path, indi_list_t *list)
     for(size_t i = 0; i < size; i++)
     {
         indi_memory_free(argv[i]);
+
+        printf("%s\n",argv[i] );
     }
 
     indi_memory_free(argv);
