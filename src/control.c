@@ -62,7 +62,7 @@ str_t indi_driver_list(STR_t path)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static int indi_add_to_envvar(STR_t name, STR_t value)
+static int indi_append_to_envvar(STR_t name, STR_t value)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -145,11 +145,11 @@ int indi_server_start(STR_t path, STR_t json)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(indi_add_to_envvar("DYLD_LIBRARY_PATH", path) < 0
+    if(indi_append_to_envvar("DYLD_LIBRARY_PATH", path) < 0
        ||
-       indi_add_to_envvar("LD_LIBRARY_PATH", path) < 0
+       indi_append_to_envvar("LD_LIBRARY_PATH", path) < 0
        ||
-       indi_add_to_envvar("PATH", path) < 0
+       indi_append_to_envvar("PATH", path) < 0
     ) {
         return -1;
     }
@@ -198,21 +198,7 @@ int indi_server_start(STR_t path, STR_t json)
 
 int indi_server_stop(int pid)
 {
-    if(pid > 0)
-    {
-        int status;
-
-        kill(pid, SIGTERM);
-
-        waitpid(pid, &status, 0);
-
-        if(WIFEXITED(status))
-        {
-            return WEXITSTATUS(status);
-        }
-    }
-
-    return -1;
+    return system("pkill indiserver");
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
