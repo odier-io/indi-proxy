@@ -62,7 +62,35 @@ str_t indi_driver_list(STR_t path)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static __NORETURN__ int indi_server_exec(STR_t path, indi_list_t *list)
+static void indi_add_to_path(STR_t path)
+{
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    char *cur_path = getenv("PATH");
+
+    if(cur_path == NULL)
+    {
+        cur_path = "";
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    size_t path_size = strlen(cur_path) + strlen(path) + 2;
+
+    char *new_path = (char *) indi_memory_alloc(path_size);
+
+    snprintf(new_path, path_size, "%s:%s", path, cur_path);
+
+    setenv("PATH", new_path, 1);
+
+    indi_memory_free(new_path);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+static __NORETURN__ int indi_server_exec(indi_list_t *list)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -80,25 +108,6 @@ static __NORETURN__ int indi_server_exec(STR_t path, indi_list_t *list)
     }
 
     argv[size] = NULL;
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    char *cur_path = getenv("PATH");
-
-    if(cur_path == NULL)
-    {
-        cur_path = "";
-    }
-
-    size_t path_size = strlen(cur_path) + strlen(path) + 2;
-
-    char *new_path = (char *) indi_memory_alloc(path_size);
-
-    snprintf(new_path, path_size, "%s:%s", path, cur_path);
-
-    setenv("PATH", new_path, 1);
-
-    indi_memory_free(new_path);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -166,7 +175,9 @@ int indi_server_start(STR_t path, STR_t json)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    indi_server_exec(path, (indi_list_t *) object);
+    indi_add_to_path(path);
+
+    indi_server_exec((indi_list_t *) object);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
