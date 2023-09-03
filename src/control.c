@@ -116,7 +116,7 @@ static __NORETURN__ int indi_server_exec(indi_list_t *list)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    int result = execv("/Applications/kstars.app/Contents/MacOS/indiserver", argv);
+    int result = execvp("indiserver", argv);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
