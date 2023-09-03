@@ -422,6 +422,29 @@ static PyObject *py_indi_server_start(PyIndiObject *self, PyObject *args, PyObje
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
+
+static PyObject *py_indi_server_stop(PyIndiObject *self, PyObject *args, PyObject *kwds)
+{
+    int pid;
+
+    if(!PyArg_ParseTuple(args, "i", &pid))
+    {
+        return NULL;
+    }
+
+    int result = indi_server_stop(pid);
+
+    if (result < 0)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to stop INDI server");
+
+        return NULL;
+    }
+
+    return PyLong_FromLong((long) result);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -496,6 +519,7 @@ static PyMethodDef indi_proxy_methods[] = {
     {"cleanup", (PyCFunction) py_indi_cleanup, METH_NOARGS, "???"},
     {"driver_list", (PyCFunction) py_indi_driver_list, METH_VARARGS, "???"},
     {"server_start", (PyCFunction) py_indi_server_start, METH_VARARGS, "???"},
+    {"server_stop", (PyCFunction) py_indi_server_stop, METH_VARARGS, "???"},
     /**/
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
