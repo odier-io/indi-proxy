@@ -2,12 +2,9 @@
 
 #include <stdio.h>
 #include <dirent.h>
-#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#include <sys/wait.h>
 
 #include "indi_proxy_internal.h"
 
