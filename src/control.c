@@ -62,7 +62,7 @@ str_t indi_driver_list(STR_t path)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static void indi_add_to_path(STR_t path)
+static int indi_add_to_path(STR_t path)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -75,15 +75,19 @@ static void indi_add_to_path(STR_t path)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    size_t path_size = strlen(cur_path) + strlen(path) + 2;
+    char *new_path = (char *) indi_memory_alloc(strlen(path) + 1 + strlen(cur_path) + 1);
 
-    char *new_path = (char *) indi_memory_alloc(path_size);
+    sprintf(new_path, "%s:%s", path, cur_path);
 
-    snprintf(new_path, path_size, "%s:%s", path, cur_path);
+    printf("%s\n", new_path);
 
-    setenv("PATH", new_path, 1);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    int result = setenv("PATH", new_path, 1);
 
     indi_memory_free(new_path);
+
+    return result;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 }
@@ -142,6 +146,13 @@ int indi_server_start(STR_t path, STR_t json)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    if(indi_add_to_path(path) < 0)
+    {
+        return -1;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     indi_object_t *object = indi_object_parse(json);
 
     if(object == NULL)
@@ -174,8 +185,6 @@ int indi_server_start(STR_t path, STR_t json)
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
-
-    indi_add_to_path(path);
 
     indi_server_exec((indi_list_t *) object);
 
