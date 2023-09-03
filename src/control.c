@@ -104,14 +104,15 @@ static __NORETURN__ int indi_server_exec(indi_list_t *list)
 
     size_t size = indi_list_size(list);
 
-    str_t *argv = indi_memory_alloc((size + 1) * sizeof(STR_t));
+    str_t *argv = indi_memory_alloc((size + 2) * sizeof(STR_t));
 
     for(indi_list_iter_t iter = INDI_LIST_ITER(list); indi_list_iterate(&iter, &idx, &obj);)
     {
-        argv[idx] = indi_object_to_cstring(obj);
+        argv[idx + 1] = indi_object_to_cstring(obj);
     }
 
-    argv[size] = NULL;
+    argv[0x00] = "indiserver";
+    argv[size] = /**/NULL/**/;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
