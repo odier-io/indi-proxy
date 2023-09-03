@@ -147,9 +147,9 @@ int indi_server_start(STR_t path, STR_t json)
 
     if(indi_add_to_envvar("DYLD_LIBRARY_PATH", path) < 0
        ||
-            indi_add_to_envvar("LD_LIBRARY_PATH", path) < 0
+       indi_add_to_envvar("LD_LIBRARY_PATH", path) < 0
        ||
-            indi_add_to_envvar("PATH", path) < 0
+       indi_add_to_envvar("PATH", path) < 0
     ) {
         return -1;
     }
