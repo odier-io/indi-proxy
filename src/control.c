@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------------------------------------------------------*/
-#include <stdio.h>
 
+#include <stdio.h>
 #include <dirent.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -77,15 +77,32 @@ static __NORETURN__ int indi_server_exec(STR_t path, indi_list_t *list)
     for(indi_list_iter_t iter = INDI_LIST_ITER(list); indi_list_iterate(&iter, &idx, &obj);)
     {
         argv[idx] = indi_object_to_cstring(obj);
-
-        printf("%s\n", argv[idx]);
     }
 
     argv[size] = NULL;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    int result = execv(path, argv);
+    char *cur_path = getenv("PATH");
+
+    if(cur_path == NULL)
+    {
+        cur_path = "";
+    }
+
+    size_t path_size = strlen(cur_path) + strlen(path) + 2;
+
+    char *new_path = (char *) indi_memory_alloc(path_size);
+
+    snprintf(new_path, path_size, "%s:%s", path, cur_path);
+
+    setenv("PATH", new_path, 1);
+
+    indi_memory_free(new_path);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    int result = execv("indiserver", argv);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
