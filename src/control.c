@@ -109,8 +109,8 @@ static __NORETURN__ int indi_server_exec(indi_list_t *list)
         args[idx + 1] = indi_object_to_cstring(obj);
     }
 
-    args[0x00] = "indiserver";
-    args[size] = /**/NULL/**/;
+    args[0x000000] = "indiserver";
+    args[size + 1] = /**/NULL/**/;
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
