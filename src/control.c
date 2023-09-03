@@ -62,30 +62,28 @@ str_t indi_driver_list(STR_t path)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-static int indi_add_to_path(STR_t path)
+static int indi_add_to_envvar(STR_t name, STR_t value)
 {
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    char *cur_path = getenv("PATH");
+    char *cur_value = getenv(name);
 
-    if(cur_path == NULL)
+    if(cur_value == NULL)
     {
-        cur_path = "";
+        cur_value = "";
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    char *new_path = (char *) indi_memory_alloc(strlen(path) + 1 + strlen(cur_path) + 1);
+    char *new_value = (char *) indi_memory_alloc(strlen(value) + 1 + strlen(cur_value) + 1);
 
-    sprintf(new_path, "%s:%s", path, cur_path);
-
-    printf("%s\n", new_path);
+    sprintf(new_value, "%s:%s", value, cur_value);
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    int result = setenv("PATH", new_path, 1);
+    int result = setenv(name, new_value, 1);
 
-    indi_memory_free(new_path);
+    indi_memory_free(new_value);
 
     return result;
 
@@ -147,8 +145,12 @@ int indi_server_start(STR_t path, STR_t json)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    if(indi_add_to_path(path) < 0)
-    {
+    if(indi_add_to_envvar("DYLD_LIBRARY_PATH", path) < 0
+       ||
+            indi_add_to_envvar("LD_LIBRARY_PATH", path) < 0
+       ||
+            indi_add_to_envvar("PATH", path) < 0
+    ) {
         return -1;
     }
 
