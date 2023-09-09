@@ -65,7 +65,7 @@ size_t indi_memory_free(buff_t buff)
     #ifdef HAVE_MALLOC_USABLE_SIZE
     size_t result = malloc_usable_size(buff);
 
-    used_mem += result;
+    used_mem -= result;
     #endif
 
     /*----------------------------------------------------------------------------------------------------------------*/
@@ -92,12 +92,6 @@ buff_t indi_memory_alloc(size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    #ifdef HAVE_MALLOC_USABLE_SIZE
-    used_mem += size;
-    #endif
-
-    /*----------------------------------------------------------------------------------------------------------------*/
-
     buff_t result = malloc(size);
 
     if(result == NULL)
@@ -106,6 +100,12 @@ buff_t indi_memory_alloc(size_t size)
         fflush(stderr);
         exit(1);
     }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    #ifdef HAVE_MALLOC_USABLE_SIZE
+    used_mem += malloc_usable_size(result);
+    #endif
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
@@ -127,7 +127,7 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
     /*----------------------------------------------------------------------------------------------------------------*/
 
     #ifdef HAVE_MALLOC_USABLE_SIZE
-    used_mem = used_mem - malloc_usable_size(buff) + size;
+    used_mem -= malloc_usable_size(buff);
     #endif
 
     /*----------------------------------------------------------------------------------------------------------------*/
@@ -140,6 +140,12 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
         fflush(stderr);
         exit(1);
     }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    #ifdef HAVE_MALLOC_USABLE_SIZE
+    used_mem += malloc_usable_size(buff);
+    #endif
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
