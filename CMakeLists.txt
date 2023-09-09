@@ -14,8 +14,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC -flto -fomit-frame-pointer")
 
 find_package(LibXml2 REQUIRED)
 
-include_directories(/usr/include/libxml2)
-
 ########################################################################################################################
 
 set(SOURCE_FILES
@@ -45,6 +43,7 @@ set(SOURCE_FILES
 
 add_library(indi-proxy-static STATIC ${SOURCE_FILES})
 
+target_include_directories(indi-proxy-static PRIVATE /usr/include/libxml2)
 target_include_directories(indi-proxy-static PRIVATE ${LIBXML2_INCLUDE_DIR})
 
 ######_link_libraries(indi-proxy-static ${LIBXML2_LIBRARIES})
@@ -57,6 +56,7 @@ set_target_properties(indi-proxy-static PROPERTIES
 
 add_library(indi-proxy-shared SHARED ${SOURCE_FILES})
 
+target_include_directories(indi-proxy-shared PRIVATE /usr/include/libxml2)
 target_include_directories(indi-proxy-shared PRIVATE ${LIBXML2_INCLUDE_DIR})
 
 target_link_libraries(indi-proxy-shared ${LIBXML2_LIBRARIES})
