@@ -1,7 +1,38 @@
 #!/usr/bin/env python3
 ########################################################################################################################
 
+import ctypes
+import ctypes.util
+
 from setuptools import setup, Extension
+
+########################################################################################################################
+
+def check_function_exists(lib_name, func_name):
+
+    try:
+
+        lib = ctypes.CDLL(lib_name)
+
+        getattr(lib, func_name)
+
+        return True
+
+    except:
+
+        return False
+
+########################################################################################################################
+
+define_macros = []
+
+libc_name = ctypes.util.find_library('c')
+
+if check_function_exists(libc_name, 'malloc_size'):
+    define_macros.append(('HAVE_MALLOC_SIZE', '1'))
+
+if check_function_exists(libc_name, 'malloc_usable_size'):
+    define_macros.append(('HAVE_MALLOC_USABLE_SIZE', '1'))
 
 ########################################################################################################################
 
@@ -29,7 +60,8 @@ indi_proxy_module = Extension(
     ],
     include_dirs = [
         '/usr/include/libxml2'
-    ]
+    ],
+    define_macros = define_macros
 )
 
 ########################################################################################################################
