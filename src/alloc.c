@@ -11,6 +11,10 @@
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+#ifdef HAVE_MALLOC_SIZE
+size_t malloc_size(buff_t);
+#endif
+
 #ifdef HAVE_MALLOC_USABLE_SIZE
 size_t malloc_usable_size(buff_t);
 #endif
@@ -18,7 +22,7 @@ size_t malloc_usable_size(buff_t);
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-#ifdef HAVE_MALLOC_USABLE_SIZE
+#if defined(HAVE_MALLOC_SIZE) || defined(HAVE_MALLOC_USABLE_SIZE)
 static size_t used_mem = 0;
 #endif
 
@@ -38,7 +42,7 @@ void indi_memory_initialize()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    #ifdef HAVE_MALLOC_USABLE_SIZE
+    #if defined(HAVE_MALLOC_SIZE) || defined(HAVE_MALLOC_USABLE_SIZE)
     used_mem = 0;
     #endif
 
@@ -55,7 +59,7 @@ void indi_memory_finalize()
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    #ifdef HAVE_MALLOC_USABLE_SIZE
+    #if defined(HAVE_MALLOC_SIZE) || defined(HAVE_MALLOC_USABLE_SIZE)
     if(used_mem > 0) fprintf(stderr, "Memory leak: %ld bytes!\n", used_mem);
     #endif
 
@@ -74,6 +78,12 @@ size_t indi_memory_free(buff_t buff)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    #ifdef HAVE_MALLOC_SIZE
+    size_t result = malloc_size(buff);
+
+    used_mem -= result;
+    #endif
+
     #ifdef HAVE_MALLOC_USABLE_SIZE
     size_t result = malloc_usable_size(buff);
 
@@ -86,7 +96,7 @@ size_t indi_memory_free(buff_t buff)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
-    #ifdef HAVE_MALLOC_USABLE_SIZE
+    #if defined(HAVE_MALLOC_SIZE) || defined(HAVE_MALLOC_USABLE_SIZE)
     return result;
     #else
     return 0x0000;
@@ -115,6 +125,10 @@ buff_t indi_memory_alloc(size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    #ifdef HAVE_MALLOC_SIZE
+    used_mem += malloc_size(result);
+    #endif
+
     #ifdef HAVE_MALLOC_USABLE_SIZE
     used_mem += malloc_usable_size(result);
     #endif
@@ -138,6 +152,10 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
 
     /*----------------------------------------------------------------------------------------------------------------*/
 
+    #ifdef HAVE_MALLOC_SIZE
+    used_mem -= malloc_size(buff);
+    #endif
+
     #ifdef HAVE_MALLOC_USABLE_SIZE
     used_mem -= malloc_usable_size(buff);
     #endif
@@ -154,6 +172,10 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
     }
 
     /*----------------------------------------------------------------------------------------------------------------*/
+
+    #ifdef HAVE_MALLOC_SIZE
+    used_mem += malloc_size(result);
+    #endif
 
     #ifdef HAVE_MALLOC_USABLE_SIZE
     used_mem += malloc_usable_size(result);
