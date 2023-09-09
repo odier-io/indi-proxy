@@ -2,7 +2,11 @@
 
 #include <stdio.h>
 
-#include <libxml/xmlschemas.h>
+#ifdef __APPLE__
+#  include <libxml/xmlschemas.h>
+#else
+#  include <libxml2/xmlschemas.h>
+#endif
 
 #include "indi_proxy_internal.h"
 

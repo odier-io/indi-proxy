@@ -2,7 +2,11 @@
 
 #include <string.h>
 
-#include <libxml/tree.h>
+#ifdef __APPLE__
+#  include <libxml/tree.h>
+#else
+#  include <libxml2/tree.h>
+#endif
 
 #include "indi_proxy_internal.h"
 
