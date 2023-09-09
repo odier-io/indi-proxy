@@ -5,11 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __APPLE__
-#  include <libxml/parser.h>
-#else
-#  include <libxml2/parser.h>
-#endif
+#include <libxml/parser.h>
 
 #include "indi_proxy_internal.h"
 
