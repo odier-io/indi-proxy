@@ -26,6 +26,9 @@ indi_proxy_module = Extension(
         'src/control.c',
         #
         'src/module.c',
+    ],
+    include_dirs = [
+        '/usr/include/libxml2'
     ]
 )
 
