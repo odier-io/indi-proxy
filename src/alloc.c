@@ -156,7 +156,7 @@ buff_t indi_memory_realloc(buff_t buff, size_t size)
     /*----------------------------------------------------------------------------------------------------------------*/
 
     #ifdef HAVE_MALLOC_USABLE_SIZE
-    used_mem += malloc_usable_size(buff);
+    used_mem += malloc_usable_size(result);
     #endif
 
     /*----------------------------------------------------------------------------------------------------------------*/
