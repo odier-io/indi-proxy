@@ -16,6 +16,12 @@ find_package(LibXml2 REQUIRED)
 
 ########################################################################################################################
 
+include(CheckFunctionExists)
+
+check_function_exists(malloc_usable_size HAVE_MALLOC_USABLE_SIZE)
+
+########################################################################################################################
+
 set(SOURCE_FILES
     src/indi_proxy.h
     src/indi_proxy_schema.h
@@ -43,6 +49,10 @@ set(SOURCE_FILES
 
 add_library(indi-proxy-static STATIC ${SOURCE_FILES})
 
+if(HAVE_MALLOC_USABLE_SIZE)
+    target_compile_definitions(indi-proxy-static PRIVATE HAVE_MALLOC_USABLE_SIZE)
+endif()
+
 target_include_directories(indi-proxy-static PRIVATE ${LIBXML2_INCLUDE_DIR})
 
 ######_link_libraries(indi-proxy-static ${LIBXML2_LIBRARIES})
@@ -54,6 +64,10 @@ set_target_properties(indi-proxy-static PROPERTIES
 ########################################################################################################################
 
 add_library(indi-proxy-shared SHARED ${SOURCE_FILES})
+
+if(HAVE_MALLOC_USABLE_SIZE)
+    target_compile_definitions(indi-proxy-shared PRIVATE HAVE_MALLOC_USABLE_SIZE)
+endif()
 
 target_include_directories(indi-proxy-shared PRIVATE ${LIBXML2_INCLUDE_DIR})
 
