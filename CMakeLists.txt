@@ -8,11 +8,13 @@ project(indi_proxy C)
 
 set(CMAKE_C_STANDARD 99)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC -flto -fomit-frame-pointer -I /usr/include/libxml2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -fPIC -flto -fomit-frame-pointer")
 
 ########################################################################################################################
 
 find_package(LibXml2 REQUIRED)
+
+include_directories(/usr/include/libxml2)
 
 ########################################################################################################################
 
