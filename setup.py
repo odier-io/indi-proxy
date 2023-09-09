@@ -10,6 +10,7 @@ from setuptools import setup, Extension
 
 def check_function_exists(lib_name, func_name):
 
+    # noinspection PyBroadException
     try:
 
         lib = ctypes.CDLL(lib_name)
